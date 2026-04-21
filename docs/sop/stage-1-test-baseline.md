@@ -64,7 +64,7 @@ mvn -P integration-mysql-baseline test
 
 - Git 提交：`test: Stage 1 测试兜底，MySQL 下基线全绿`
 - 打 tag：`stage-1-baseline-mysql-green`
-- **这是回归对照基准**，Stage 5 将用相同测试集在 GaussDB 下重跑
+- **这是回归对照基准**，Stage 5 将用相同测试集在瀚高 v4.1.5 下重跑
 
 ## 出口检查
 

@@ -16,16 +16,16 @@
 
 ## 步骤
 
-### 5.1 全量回归（GaussDB）
+### 5.1 全量回归（瀚高 v4.1.5）
 
 ```bash
-mvn -P integration-gaussdb clean test
+mvn -P integration-highgo clean test
 ```
 
 要求：
 - 所有单元测试绿
 - 所有集成测试绿
-- 与 Stage 1 MySQL 基线比对，用例数一致（除非有明确声明的"GaussDB 特有用例"或"MySQL 特有用例已下线"）
+- 与 Stage 1 MySQL 基线比对，用例数一致（除非有明确声明的"瀚高特有用例"或"MySQL 特有用例已下线"）
 
 ### 5.2 启动冒烟 + 接口回归
 
@@ -35,9 +35,9 @@ mvn -P integration-gaussdb clean test
 
 ### 5.3 配置产物复查
 
-- [ ] `application-integration-gaussdb.yml` 字段齐全
+- [ ] `application-integration-highgo.yml` 字段齐全
 - [ ] Druid / HikariCP 参数合理
-- [ ] Flyway `locations` 指向 `gaussdb` 目录
+- [ ] Flyway `locations` 指向 `highgo` 目录
 - [ ] 日志无 `WARN` / `ERROR` 堆栈
 - [ ] 连接池空闲 / 活跃数监控指标正常
 
@@ -45,7 +45,7 @@ mvn -P integration-gaussdb clean test
 
 调用 Skill `db-migration-verify` 生成骨架，人工补全。
 
-文件：`project-docs/reports/YYYY-MM-DD-gaussdb-migration-report.md`
+文件：`project-docs/reports/YYYY-MM-DD-highgo-migration-report.md`
 
 参照模板：[`templates/migration-report-template.md`](../templates/migration-report-template.md)
 
@@ -54,7 +54,7 @@ mvn -P integration-gaussdb clean test
 - 各阶段耗时
 - 改造范围汇总（文件数、行数、commit 数）
 - 风险矩阵关闭情况
-- 测试对比：MySQL 基线 vs GaussDB
+- 测试对比：MySQL 基线 vs 瀚高 v4.1.5
 - 未解决问题与上游依赖
 - 回滚方案（保留 MySQL 配置的情况下如何切回）
 - 附录：决策记录索引、踩坑记录索引
@@ -113,7 +113,7 @@ related-risk: R-xx
 
 ## 产出物
 
-- `project-docs/reports/YYYY-MM-DD-gaussdb-migration-report.md`
+- `project-docs/reports/YYYY-MM-DD-highgo-migration-report.md`
 - 提交到工具包的 `fix-issue/` 条目（1 个或多个）
 - 工具包 issue 反馈
 - PR
@@ -130,7 +130,7 @@ related-risk: R-xx
 
 ## 完成标记
 
-- Git tag `stage-5-gaussdb-migration-done-vX.Y.Z`
+- Git tag `stage-5-highgo-migration-done-vX.Y.Z`
 - CHANGELOG（本工程）追加条目
 - 通知相关方
 
