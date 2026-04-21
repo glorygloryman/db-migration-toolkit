@@ -4,14 +4,14 @@
 
 ## 范围声明
 
-- [ ] 本 PR 仅涉及数据库改造（MySQL → GaussDB），不夹带业务变更
+- [ ] 本 PR 仅涉及数据库改造（MySQL → 瀚高 v4.1.5），不夹带业务变更
 - [ ] 改造对应 SOP 阶段：Stage __（0 / 1 / 2 / 3 / 4 / 5）
 - [ ] 引用母方案：`db-migration-toolkit/docs/2026-04-18-master-plan.md`
 
 ## 代码
 
 - [ ] 未修改 `db/migration/mysql/` 下任何历史脚本
-- [ ] 新增 Flyway 脚本位于 `db/migration/gaussdb/`，带 `IF NOT EXISTS` / `IF EXISTS` 防护
+- [ ] 新增 Flyway 脚本位于 `db/migration/highgo/`，带 `IF NOT EXISTS` / `IF EXISTS` 防护，R-018 已冒烟通过
 - [ ] 无 `DROP DATABASE` / `TRUNCATE` 等破坏性语句
 - [ ] 保留字列名统一策略已应用（双引号 或 改名）
 - [ ] 大小写策略已明确并应用
@@ -19,7 +19,7 @@
 
 ## 配置
 
-- [ ] `application-integration-gaussdb.yml` 未含明文密码（走占位或环境变量）
+- [ ] `application-integration-highgo.yml` 未含明文密码（走占位或环境变量）
 - [ ] `application-integration-mysql-baseline.yml` 保留未删
 - [ ] Druid / HikariCP 参数经过评估
 - [ ] 分页插件方言参数已调整
@@ -27,7 +27,7 @@
 ## 测试
 
 - [ ] 本 PR 涉及的模块，单元测试全绿
-- [ ] 本 PR 涉及的模块，集成测试在 GaussDB 下全绿
+- [ ] 本 PR 涉及的模块，集成测试在瀚高下全绿
 - [ ] 无 `@MockBean` 替代数据库
 - [ ] 无 Testcontainers 依赖引入
 - [ ] 若有用例增删，PR 描述说明原因
