@@ -1,89 +1,164 @@
-# 语法映射表（MySQL → GaussDB B 兼容模式）
+# 语法映射表（MySQL → 瀚高 v4.1.5）
 
-> B 模式原生兼容大量 MySQL 语法，本表重点标注**仍需注意**的差异。
-> 状态：✅ 直接可用 / ⚠️ 需验证 / 🔄 建议改写
+> 面向从 MySQL 迁移至瀚高数据库（HighGo DB v4.1.5，基于 PostgreSQL 内核）的语法改写指南。
+> 本表按「PG 方言」作为默认兼容口径；若项目后续确认瀚高启用 MySQL 兼容插件，再按实测结果放宽 ❌ 项。
 
-## 标识符与保留字
+## 状态标记
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| 反引号 `` `col` `` | 反引号 `` `col` `` | ✅ | B 模式支持 |
-| 双引号 `"col"` | 双引号 `"col"` | ✅ | SQL 标准 |
-| 保留字作列名 | 加引号 | ⚠️ | B 模式放宽部分保留字，仍有差异清单 |
-| 标识符大小写 | 默认转小写（PG 行为） | ⚠️ | B 模式可能调整，需验证参数 |
+| 标记 | 含义 |
+| ---- | ---- |
+| ✅ | 语法一致，可直接沿用 |
+| ⚠️ | 语法相似但存在行为差异，需评估后使用 |
+| 🔄 | 语法不一致，但存在等价改写方案 |
+| ❌ | 目标库不支持（按 PG 方言兜底），必须改写或下移到应用层 |
 
-**统一建议**：所有 SQL 标识符使用**全小写 + 下划线**，不依赖大小写保留。
+---
 
-## DML
+## 1. 标识符与保留字
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| `LIMIT count` | 同 | ✅ | |
-| `LIMIT offset, count` | 同 | ✅ | B 模式兼容 |
-| `LIMIT count OFFSET offset` | 同 | ✅ | SQL 标准，均支持 |
-| `INSERT IGNORE` | 同 | ✅ | |
-| `ON DUPLICATE KEY UPDATE` | 同 | ✅ | |
-| `REPLACE INTO` | 同 | ✅ | |
-| `INSERT ... SELECT` | 同 | ✅ | |
-| 多值 `INSERT VALUES (),(),(),...` | 同 | ✅ | |
-| `UPDATE ... LIMIT n` | 同 | ⚠️ | B 模式支持，PG 模式不支持 |
-| `DELETE ... LIMIT n` | 同 | ⚠️ | 同上 |
-| `UPDATE t1 JOIN t2 SET ...` | 同 | ⚠️ | B 模式支持多表 UPDATE |
+| MySQL 语法 | 瀚高（PG 方言） | 状态 | 改写 / 备注 |
+| ---------- | ---------------- | ---- | ----------- |
+| `` `col_name` ``（反引号包裹标识符） | 不支持反引号 | ❌ | 改为双引号 `"col_name"`；或在识别安全的前提下直接去引号（见下条大小写规则） |
+| `"col_name"`（双引号标识符） | 双引号表示定界标识符 | ✅ | 语义一致；注意 MySQL 默认双引号是字符串字面量，迁移脚本需确认 `sql_mode` |
+| MySQL 保留字集合 | PG 保留字集合 | ⚠️ | 两者保留字不完全一致，例如 `user`、`group`、`order`、`type`、`desc` 等在 PG 中需谨慎；发现冲突统一使用双引号包裹 |
+| 未加引号标识符大小写 | 未加引号默认**折叠为小写** | ⚠️ | MySQL 在 Linux 默认大小写敏感但存储保留原样；PG 将 `MyTable` 折叠为 `mytable`。迁移时确认：① Java 层 ORM/映射是否显式指定列名；② 旧脚本是否误用 `"MyTable"` 产生大小写敏感表 |
+| 标识符长度 64 字符上限 | 63 字节上限 | ⚠️ | 极端长命名需缩短 |
 
-## DDL
+---
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| `CREATE TABLE ... ENGINE=InnoDB` | `CREATE TABLE ...` | 🔄 | ENGINE 子句建议去除 |
-| `DEFAULT CHARSET=utf8mb4` | 库级字符集 | 🔄 | 表级字符集通常去除 |
-| `AUTO_INCREMENT` | 同 | ✅ | B 模式原生支持 |
-| `AUTO_INCREMENT=100`（表起始值） | 同 | ⚠️ | 验证 |
-| `KEY idx (col(10))`（前缀索引） | 不支持 | 🔄 | 改函数索引或去前缀 |
-| `UNIQUE KEY` | `UNIQUE` | ✅ | |
-| `FULLTEXT INDEX` | GaussDB 全文索引方案不同 | 🔄 | 专项评估 |
-| `COMMENT '...'`（列/表） | 同 | ⚠️ | B 模式支持 |
-| `ON UPDATE CURRENT_TIMESTAMP` | 同 | ⚠️ | B 模式支持，行为验证 |
+## 2. DML（增删改查）
 
-## 查询
+### 2.1 分页
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| `GROUP BY` 允许非聚合列 | 严格模式可能禁止 | ⚠️ | B 模式行为需验证，若严格需加聚合 |
-| `ORDER BY RAND()` | `ORDER BY RANDOM()` 或 `ORDER BY RAND()` | ⚠️ | 函数名差异 |
-| `STRAIGHT_JOIN` | — | 🔄 | 去除，让优化器决定 |
-| `USE INDEX` / `FORCE INDEX` Hint | GaussDB 有自己的 Hint 语法 | 🔄 | 如使用需改写 |
-| 子查询 `(SELECT ...)` | 同 | ✅ | |
-| `WITH` CTE | 同 | ✅ | 均支持 |
-| `LATERAL` | PG 支持，MySQL 8 支持 | ✅ | |
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `LIMIT count` | `LIMIT count` | ✅ | 直接沿用 |
+| `LIMIT offset, count` | 不支持逗号语法 | ❌ | 改为 `LIMIT count OFFSET offset` |
+| `LIMIT count OFFSET offset` | 支持 | ✅ | 统一迁移到此写法 |
 
-## 事务
+### 2.2 冲突处理
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| `START TRANSACTION` / `BEGIN` / `COMMIT` / `ROLLBACK` | 同 | ✅ | |
-| `SAVEPOINT` / `RELEASE SAVEPOINT` | 同 | ✅ | |
-| `SELECT ... FOR UPDATE` | 同 | ⚠️ | 锁行为在 MVCC 下可能不同 |
-| `SELECT ... LOCK IN SHARE MODE` | `SELECT ... FOR SHARE` | 🔄 | 建议改 FOR SHARE |
-| 隔离级别 `READ COMMITTED` | 同 | ✅ | |
-| 隔离级别 `REPEATABLE READ` | 同 | ⚠️ | MVCC 实现差异，幻读行为可能不同 |
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `INSERT IGNORE INTO t ...` | 不支持 | ❌ | 改为 `INSERT INTO t ... ON CONFLICT DO NOTHING`（需存在唯一约束） |
+| `INSERT ... ON DUPLICATE KEY UPDATE col=VALUES(col)` | 不支持 | ❌ | 改为 `INSERT ... ON CONFLICT (unique_key) DO UPDATE SET col = EXCLUDED.col` |
+| `REPLACE INTO t ...` | 不支持 | ❌ | 语义需拆分：① `ON CONFLICT (key) DO UPDATE`；② 或事务内 `DELETE` + `INSERT`。注意 `REPLACE` 会触发删除后再插入，副作用（触发器、序列）差异显著，迁移需评估 |
 
-## 管理与元数据
+### 2.3 带 LIMIT 的更新/删除
 
-| MySQL | GaussDB B 模式 | 状态 | 说明 |
-|-------|----------------|------|------|
-| `SHOW TABLES` | 同 或 `\dt` | ⚠️ | B 模式支持 SHOW 系列 |
-| `SHOW CREATE TABLE t` | 同 | ⚠️ | B 模式支持 |
-| `DESC t` / `DESCRIBE t` | 同 | ⚠️ | |
-| `information_schema.*` | 同 | ✅ | |
-| `EXPLAIN` | 同（输出格式不同） | ⚠️ | 计划格式差异，不影响 SQL 本身 |
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `UPDATE t SET c=? WHERE ... LIMIT n` | 不支持 | ❌ | 改为子查询限定主键：`UPDATE t SET c=? WHERE id IN (SELECT id FROM t WHERE ... LIMIT n)` |
+| `DELETE FROM t WHERE ... LIMIT n` | 不支持 | ❌ | 改为：`DELETE FROM t WHERE id IN (SELECT id FROM t WHERE ... LIMIT n)` |
 
-## 存储过程 / 触发器
+### 2.4 多表 UPDATE / DELETE
 
-**本方案默认不重写**，如工程依赖，单独评估。
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `UPDATE t1 JOIN t2 ON ... SET t1.c = t2.c` | 不支持 MySQL 式多表 UPDATE | ❌ | 改为 PG 的 `UPDATE ... FROM`：`UPDATE t1 SET c = t2.c FROM t2 WHERE t1.fk = t2.id` |
+| `DELETE t1 FROM t1 JOIN t2 ON ...` | 不支持 | ❌ | 改为 `DELETE FROM t1 USING t2 WHERE t1.fk = t2.id` |
 
-- MySQL `DELIMITER //` 分隔符语法
-- `CREATE PROCEDURE` / `CREATE TRIGGER` 语法
-- 局部变量声明 `DECLARE`
-- 游标、异常处理
+---
 
-B 模式对此类有**部分兼容**，但不完整。建议上移到 Java 层。
+## 3. DDL（建表与索引）
+
+### 3.1 表属性
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `ENGINE=InnoDB` | 无存储引擎概念 | 🔄 | 直接去除 |
+| `DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`（表级） | PG 字符集在数据库级，表级不支持 | 🔄 | 去除；在 `CREATE DATABASE` 时统一 `ENCODING 'UTF8' LC_COLLATE '...'` |
+| `ROW_FORMAT=DYNAMIC` / `KEY_BLOCK_SIZE` | 不适用 | 🔄 | 去除 |
+
+### 3.2 自增列
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `id BIGINT AUTO_INCREMENT PRIMARY KEY` | 支持 `SERIAL` / `BIGSERIAL`，推荐 SQL 标准 `IDENTITY` | 🔄 | 改为 `id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY`；或简写 `id BIGSERIAL PRIMARY KEY` |
+| `ALTER TABLE t AUTO_INCREMENT = 1000` | 需操作序列 | 🔄 | `ALTER SEQUENCE t_id_seq RESTART WITH 1000` |
+
+### 3.3 索引
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `KEY idx_name (col)` / `INDEX idx (col)`（建表内联） | PG 建表内联不支持普通索引 | 🔄 | 拆分为 `CREATE INDEX idx_name ON t (col);` |
+| `KEY idx (col(10))`（前缀索引） | 不支持列前缀 | 🔄 | 改为表达式索引：`CREATE INDEX idx ON t ((left(col, 10)));` 或 `CREATE INDEX idx ON t (substring(col, 1, 10));` |
+| `FULLTEXT INDEX (col)` | 不兼容 MySQL FULLTEXT | 🔄 | 改为 `tsvector` + GIN：`CREATE INDEX idx ON t USING GIN (to_tsvector('simple', col));`，查询侧改 `@@` 匹配 |
+| `SPATIAL INDEX` | 需 PostGIS | 🔄 | 安装 PostGIS 扩展后使用 `USING GIST` |
+| `UNIQUE KEY uk (col)` | 支持 | ✅ | 可保留，或改写为 `CREATE UNIQUE INDEX` |
+
+### 3.4 注释
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `CREATE TABLE t ( ... ) COMMENT='表注释'` | 不支持 | 🔄 | `COMMENT ON TABLE t IS '表注释';` |
+| `col VARCHAR(32) COMMENT '列注释'`（列内联注释） | 不支持 | 🔄 | `COMMENT ON COLUMN t.col IS '列注释';` |
+
+### 3.5 时间戳默认值
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `DEFAULT CURRENT_TIMESTAMP` | 支持 | ✅ | 直接沿用（列类型改 `TIMESTAMP` 或 `TIMESTAMPTZ`） |
+| `ON UPDATE CURRENT_TIMESTAMP` | 无原生等价 | ❌ | 方案一：创建 `BEFORE UPDATE` 触发器 + `NEW.updated_at = now()`；方案二：统一在应用层（MyBatis/JPA）设置更新时间。优先推荐方案二避免触发器维护成本 |
+
+---
+
+## 4. 查询语义
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `GROUP BY` 允许 SELECT 列表出现非聚合、非分组列 | PG 严格遵循 SQL 标准，必须出现在 GROUP BY 或聚合内 | ❌ | 显式聚合（`MAX(col)` / `MIN(col)`）或补全到 GROUP BY；可利用 `DISTINCT ON` 替代 MySQL 的「取组内任意行」语义 |
+| `ORDER BY RAND()` | 不支持 `RAND()` 函数名 | 🔄 | 改为 `ORDER BY RANDOM()` |
+| `STRAIGHT_JOIN` | 不支持 | 🔄 | 去除；如需强制连接顺序，使用 PG 的 `join_collapse_limit=1` 会话参数或 `pg_hint_plan` 扩展 |
+| `USE INDEX(...)` / `FORCE INDEX(...)` / `IGNORE INDEX(...)` | 不支持 hint 语法 | 🔄 | 去除；必要时改用 `enable_seqscan=off`、`pg_hint_plan` 扩展 |
+| 字符串拼接 `CONCAT(a,b)` | 支持 `CONCAT`，也支持 `||` | ✅ | 注意 `||` 在有 NULL 时整表达式为 NULL，与 `CONCAT` 行为不同 |
+| `IFNULL(a, b)` | `COALESCE(a, b)` | 🔄 | 通用改写为 `COALESCE` |
+
+---
+
+## 5. 事务与锁
+
+| MySQL 语法 | 瀚高 | 状态 | 备注 |
+| ---------- | ---- | ---- | ---- |
+| `BEGIN; ... COMMIT; ROLLBACK;` | 支持 | ✅ | 语义一致；PG 亦支持 `START TRANSACTION` |
+| `SELECT ... FOR UPDATE` | 支持 | ⚠️ | PG 基于 MVCC，锁语义与 InnoDB 存在差异（间隙锁概念不同）；并发批量更新场景需重测死锁 |
+| `SELECT ... LOCK IN SHARE MODE` | 不支持该写法 | 🔄 | 改为 `SELECT ... FOR SHARE` |
+| 隔离级别 `REPEATABLE READ`（默认） | PG 默认 `READ COMMITTED`，可设 `REPEATABLE READ` / `SERIALIZABLE` | ⚠️ | MySQL RR 可见性（基于 undo）与 PG RR（真快照）语义不同；依赖 MySQL RR + 间隙锁防幻读的逻辑需评估迁移到 `SERIALIZABLE` 或应用层唯一约束 |
+| `SET autocommit = 0` | PG 每语句默认处于事务或隐式提交 | ⚠️ | JDBC 驱动 `setAutoCommit(false)` 行为一致；避免在 SQL 中使用 MySQL 风格开关 |
+
+---
+
+## 6. 管理与元数据
+
+| MySQL 语法 | 瀚高 | 状态 | 改写 |
+| ---------- | ---- | ---- | ---- |
+| `SHOW TABLES` | `\dt`（psql 元命令）或 `information_schema.tables` | 🔄 | 脚本化查询使用 `SELECT tablename FROM pg_tables WHERE schemaname = current_schema();` |
+| `SHOW DATABASES` | `\l` 或 `SELECT datname FROM pg_database;` | 🔄 | 同上 |
+| `SHOW COLUMNS FROM t` / `DESC t` / `DESCRIBE t` | `\d t` 或 `information_schema.columns` | 🔄 | 脚本化：`SELECT column_name, data_type FROM information_schema.columns WHERE table_name='t';` |
+| `SHOW CREATE TABLE t` | 无直接等价 | 🔄 | 使用 `pg_dump -s -t t dbname` 或第三方工具生成 DDL |
+| `SHOW INDEX FROM t` | `\di` 或 `pg_indexes` | 🔄 | `SELECT indexname, indexdef FROM pg_indexes WHERE tablename='t';` |
+| `SHOW PROCESSLIST` | `pg_stat_activity` | 🔄 | `SELECT pid, state, query FROM pg_stat_activity;` |
+| `KILL <id>` | `pg_cancel_backend(pid)` / `pg_terminate_backend(pid)` | 🔄 | 同上 |
+
+---
+
+## 7. 存储过程 / 函数 / 触发器
+
+| MySQL 语法 | 瀚高 | 状态 | 建议 |
+| ---------- | ---- | ---- | ---- |
+| `CREATE PROCEDURE ... BEGIN ... END`（MySQL 过程语言） | PL/pgSQL 语法、变量声明、异常、游标模型完全不同 | ❌ | **强烈建议上移到 Java 应用层（Service/Mapper）**。如确需保留在数据库层，需整体按 PL/pgSQL 重写，并重新编写单元测试 |
+| `CREATE FUNCTION f(...) RETURNS ... BEGIN ... END` | `CREATE FUNCTION f(...) RETURNS ... AS $$ ... $$ LANGUAGE plpgsql` | ❌ | 同上。注意 PG 函数体外层需使用 `$$` 美元引用，内部变量声明在 `DECLARE` 块 |
+| `CREATE TRIGGER ... FOR EACH ROW BEGIN ... END` | PG 触发器必须指向一个 **触发函数**，两步创建 | ❌ | 先 `CREATE FUNCTION fn_xxx() RETURNS trigger AS $$ BEGIN ... RETURN NEW; END; $$ LANGUAGE plpgsql;`，再 `CREATE TRIGGER tr_xxx BEFORE UPDATE ON t FOR EACH ROW EXECUTE FUNCTION fn_xxx();` |
+| `DELIMITER //` | 无需分隔符切换 | 🔄 | 去除；使用 `$$` 引用函数体 |
+
+---
+
+## 8. 参考
+
+- 项目 Plan v2：`project-docs/plans/2026-04-21-pivot-to-highgo.md`
+- 瀚高兼容模式说明：`docs/references/highgo-v4-compatibility.md`
+- 类型映射：`docs/references/mysql-to-highgo-type-mapping.md`
+- 函数映射：`docs/references/mysql-to-highgo-function-mapping.md`
+- PostgreSQL 官方手册（瀚高 v4.1.5 基于 PG 内核）：https://www.postgresql.org/docs/
+
+> 注：本表默认按 **PostgreSQL 方言** 判定；若后续确认瀚高启用 MySQL 兼容插件（参见 C5/C6/C7 假设验证），对应 ❌ 项可降级为 ✅ 或 ⚠️，届时统一修订本表并记录在 `fix-issue/`。
