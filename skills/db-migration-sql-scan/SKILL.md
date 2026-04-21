@@ -1,6 +1,6 @@
 ---
 name: db-migration-sql-scan
-description: 扫描工程中所有 SQL 片段（Mapper XML、注解 SQL、字符串拼接 SQL），识别 MySQL 特性用法，按类别与严重度产出风险矩阵。在 Stage 0 的 baseline 之后、Stage 4 改造之前使用。
+description: 扫描工程中所有 SQL 片段（Mapper XML、注解 SQL、字符串拼接 SQL），识别 MySQL 特性用法（相对于瀚高 PG 目标库），按类别与严重度产出风险矩阵。在 Stage 0 的 baseline 之后、Stage 4 改造之前使用。
 ---
 
 # db-migration-sql-scan
@@ -28,22 +28,24 @@ description: 扫描工程中所有 SQL 片段（Mapper XML、注解 SQL、字符
 
 ## 检测特性清单
 
-按照 `docs/references/mysql-to-gaussdb-{syntax,function,type}-mapping.md` 标注为 ⚠️ 或 🔄 的项，分类检测：
+按照 `docs/references/mysql-to-highgo-{syntax,function,type}-mapping.md` 标注为 ⚠️ 或 🔄 的项，分类检测：
 
 ### 语法类
-- 反引号 `` ` `` 标识符
-- `LIMIT m,n`（B 模式兼容，仍标记供审计）
-- `ON DUPLICATE KEY UPDATE`
-- `REPLACE INTO`
-- `INSERT IGNORE`
+- 反引号 `` ` `` 标识符 → **高风险，PG 不支持**，必须改写为双引号或去引号
+- `LIMIT m,n` → **高风险，必须改写**（PG 使用 `LIMIT n OFFSET m`）
+- `ON DUPLICATE KEY UPDATE` → **高风险，必须改写**（PG 使用 `INSERT ... ON CONFLICT ... DO UPDATE`）
+- `REPLACE INTO` → **高风险**（PG 无原生等价，需 `INSERT ... ON CONFLICT` 或改业务逻辑）
+- `INSERT IGNORE` → **高风险**（PG 使用 `INSERT ... ON CONFLICT DO NOTHING`）
 - `UPDATE ... LIMIT n` / `DELETE ... LIMIT n`
 - 多表 `UPDATE t1 JOIN t2 SET`
 - `STRAIGHT_JOIN`、`USE INDEX`、`FORCE INDEX` Hint
 
 ### 函数类
-- `GROUP_CONCAT`
-- `IFNULL`、`IF()`
-- `DATE_FORMAT`、`STR_TO_DATE`
+- `GROUP_CONCAT` → 视瀚高兼容脚本覆盖情况判定，未覆盖时改 `STRING_AGG`
+- `IFNULL(a, b)` → 检查实参类型，若非脚本覆盖重载需改写为 `COALESCE(a, b)`
+- `IF(cond, a, b)` → 检查实参类型，若非脚本覆盖重载需改写为 `CASE WHEN cond THEN a ELSE b END`
+- `DATE_FORMAT(...)` → **高风险，Pilot 首验证项（R-002）**，格式占位符差异大，兼容脚本覆盖有限
+- `STR_TO_DATE`
 - `UNIX_TIMESTAMP`、`FROM_UNIXTIME`
 - `FIND_IN_SET`
 - `REGEXP` / `RLIKE`
@@ -57,7 +59,7 @@ description: 扫描工程中所有 SQL 片段（Mapper XML、注解 SQL、字符
 - 前缀索引 `KEY x(col(10))`
 
 ### 保留字类
-对常见保留字（`user`、`type`、`role`、`desc`、`order`、`group`、`level`、`status`）在列名位置的出现做标注。
+对常见保留字（`user`、`type`、`role`、`desc`、`order`、`group`、`level`、`status`）在列名位置的出现做标注（瀚高基于 PG，保留字集与 MySQL 不完全相同，需以 PG 清单为准）。
 
 ### 事务与锁
 - `SELECT ... FOR UPDATE`

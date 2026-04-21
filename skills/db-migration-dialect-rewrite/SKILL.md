@@ -1,6 +1,6 @@
 ---
 name: db-migration-dialect-rewrite
-description: 针对风险矩阵中的某一类差异，给出 MySQL → GaussDB B 兼容模式的建议改写 diff。只产出建议，不自动改码。Stage 4 方言适配时按类别调用。
+description: 针对风险矩阵中的某一类差异，给出 MySQL → 瀚高 v4.1.5 的建议改写 diff（区分是否依赖厂家兼容脚本）。只产出建议，不自动改码。Stage 4 方言适配时按类别调用。
 ---
 
 # db-migration-dialect-rewrite
@@ -14,55 +14,104 @@ description: 针对风险矩阵中的某一类差异，给出 MySQL → GaussDB 
 
 - 已有 `project-docs/facts/YYYY-MM-DD-risk-matrix.md`
 - 风险矩阵条目已按类别分组
-- 已读 `docs/references/mysql-to-gaussdb-*.md`
+- 已读 `docs/references/mysql-to-highgo-*.md`
+- 已读 `docs/references/highgo-v4.1.5-mysql-compat-functions.md`（厂家兼容脚本覆盖/缺口清单）
 
 ## 输入
 
-- 类别名（如 "JSON 函数"、"保留字"、"字符集"、"TIMESTAMP 时区"）
+- 类别名（从下方 Stage 4 差异点分组中取）
 - 对应的风险矩阵条目子集
+
+## 差异点清单（Stage 4 分组）
+
+改写建议必须按以下五组分类输出，并在每条建议末尾明确标注「是否依赖兼容脚本」：
+
+### A. 函数层 — 厂家兼容脚本已覆盖（审计为主，不改写）
+- `IFNULL(a, b)`（若脚本已提供同名重载）→ 保留原 SQL，增补集成测试
+- `IF(cond, a, b)`（若脚本已提供同名重载）→ 保留原 SQL，增补集成测试
+- `GROUP_CONCAT`（若脚本已提供）→ 保留原 SQL，验证分隔符与 NULL 处理
+- 其他脚本覆盖函数（以 `highgo-v4.1.5-mysql-compat-functions.md` 覆盖表为准）
+
+建议标签：`依赖兼容脚本：是`；动作：**不改 SQL**，但 Stage 1 必须补集成测试验证行为一致。
+
+### B. 函数层 — 脚本覆盖有缺口（必改写）
+- `DATE_FORMAT(...)` → 改写为 `TO_CHAR(..., 'YYYY-MM-DD')` 等 PG 格式符，**Pilot 首验证项（R-002）**
+- `STR_TO_DATE(...)` → 改写为 `TO_DATE(...)` / `TO_TIMESTAMP(...)`
+- `UNIX_TIMESTAMP` / `FROM_UNIXTIME` → 改写为 `EXTRACT(EPOCH FROM ...)` / `TO_TIMESTAMP(epoch)`
+- `FIND_IN_SET(x, csv)` → 改写为 `x = ANY(string_to_array(csv, ','))`
+- JSON 函数（`JSON_EXTRACT` / `->` / `JSON_CONTAINS` 等）→ 改写为 PG `jsonb` 运算符
+- `REGEXP` / `RLIKE` → 改写为 `~` / `~*`
+
+建议标签：`依赖兼容脚本：否（脚本缺口）`；动作：**必须改写 SQL**。
+
+### C. 语法层 — 必改（PG 不兼容）
+- 反引号标识符 `` ` `` → 改写为双引号或去引号（小写统一）
+- `LIMIT m,n` → 改写为 `LIMIT n OFFSET m`
+- `ON DUPLICATE KEY UPDATE` → 改写为 `INSERT ... ON CONFLICT (key) DO UPDATE SET ...`
+- `REPLACE INTO` / `INSERT IGNORE` → 改写为 `INSERT ... ON CONFLICT DO NOTHING/UPDATE`
+- 多表 `UPDATE t1 JOIN t2 SET ...` → 改写为 `UPDATE t1 SET ... FROM t2 WHERE ...`
+- `UPDATE ... LIMIT n` / `DELETE ... LIMIT n` → 改写为子查询 `WHERE ctid IN (SELECT ctid ... LIMIT n)`
+- Hint（`STRAIGHT_JOIN` / `USE INDEX` / `FORCE INDEX`）→ 去除，让 PG 优化器决策
+
+建议标签：`依赖兼容脚本：否`；动作：**必须改写 SQL**。
+
+### D. 类型与保留字层 — 必改
+- 保留字列名（MySQL 允许但 PG 拒绝的关键字）→ 加双引号或改名
+- 大小写敏感：PG 未引用的标识符默认转小写，需统一
+- 时区敏感列：`DATETIME` vs `TIMESTAMPTZ` 语义差异
+
+建议标签：`依赖兼容脚本：否`；动作：**必须改写**，并评估跨 Mapper 影响面。
+
+### E. 架构层 — 需方案
+- 存储过程 / 触发器 / EVENT → 不自动翻译，上升为单独决策
+- 显式隔离级别声明 → 评估是否需要改 PG 的 `SERIALIZABLE` / `READ COMMITTED`
+- `SELECT ... FOR UPDATE` / `LOCK IN SHARE MODE` → PG 兼容 `FOR UPDATE` / `FOR SHARE`，确认行为
+
+建议标签：`依赖兼容脚本：否`；动作：**方案决策**（改写 / 业务层上移 / 分方言 Mapper）。
 
 ## 执行步骤
 
 ### 1. 定位条目
 
-从 risk-matrix.md 中筛选出指定类别的所有条目。
+从 risk-matrix.md 中筛选出指定类别的所有条目，并归入上文 A~E 分组。
 
 ### 2. 按特性提供改写建议
 
-对每个条目，产出：
+对每个条目，产出（示例 — B 组）：
 
 ```
-条目 ID：R-xxx
-文件：src/main/resources/mapper/UserMapper.xml
+条目 ID：R-002
+文件：src/main/resources/mapper/OrderMapper.xml
 位置：第 42 行
 原 SQL 片段：
-    SELECT GROUP_CONCAT(name ORDER BY id SEPARATOR ',') FROM users
+    SELECT DATE_FORMAT(created_at, '%Y-%m-%d') FROM orders
 
-GaussDB B 模式预期行为：原生兼容 ✅
-建议动作：
-  - 不改 SQL，但增加集成测试验证结果与 MySQL 一致
-  - 测试要点：分隔符、排序、NULL 处理
+分组：B 组（函数层 — 脚本覆盖有缺口）
+依赖兼容脚本：否（脚本缺口）
+建议改写（diff 形式）：
+    - SELECT DATE_FORMAT(created_at, '%Y-%m-%d') FROM orders
+    + SELECT TO_CHAR(created_at, 'YYYY-MM-DD') FROM orders
 
-参考：docs/references/mysql-to-gaussdb-function-mapping.md#group_concat
+风险：格式占位符差异大，务必覆盖所有调用点
+参考：docs/references/mysql-to-highgo-function-mapping.md#date_format
+     docs/references/highgo-v4.1.5-mysql-compat-functions.md（缺口）
 ```
 
+示例（A 组 — 审计为主）：
+
 ```
-条目 ID：R-xxx
-文件：src/main/resources/mapper/OrderMapper.xml
+条目 ID：R-010
+文件：src/main/resources/mapper/UserMapper.xml
 位置：第 88 行
 原 SQL 片段：
-    SELECT * FROM orders WHERE `user` = #{userId}
+    SELECT IFNULL(nickname, '匿名') FROM users
 
-B 模式下状态：保留字 `user`，B 模式兼容但仍建议加引号
-建议改写（diff 形式）：
-    - SELECT * FROM orders WHERE `user` = #{userId}
-    + SELECT * FROM orders WHERE "user" = #{userId}
-
-或改名（影响面评估）：
-    - 代码侧：UserMapper.java 有 X 处引用
-    - 成本：中
-
-推荐：加双引号（本工程统一策略）
+分组：A 组（函数层 — 兼容脚本已覆盖）
+依赖兼容脚本：是
+建议动作：
+  - 不改 SQL
+  - Stage 1 必须补集成测试验证脚本重载签名覆盖所有实参类型组合
+参考：docs/references/highgo-v4.1.5-mysql-compat-functions.md#ifnull
 ```
 
 ### 3. 无法直接改写的场景

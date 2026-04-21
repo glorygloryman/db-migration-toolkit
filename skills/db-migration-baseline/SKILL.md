@@ -1,13 +1,13 @@
 ---
 name: db-migration-baseline
-description: MySQL → GaussDB 改造的 Stage 0 基线调研 Skill。扫描当前工程，产出前置调研三件套（baseline / risk-matrix / test-gap）骨架。在任何工程进入数据库改造前使用。
+description: MySQL → 瀚高 改造的 Stage 0 基线调研 Skill。扫描当前工程，产出前置调研三件套（baseline / risk-matrix / test-gap）骨架。在任何工程进入数据库改造前使用。
 ---
 
 # db-migration-baseline
 
 ## 触发场景
 
-- 接到"把 X 工程从 MySQL 改造到 GaussDB"任务
+- 接到"把 X 工程从 MySQL 改造到 瀚高"任务
 - 进入改造分支后第一步
 - Stage 0 立项阶段
 
