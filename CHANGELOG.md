@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.2.0 — 2026-04-21
+
+**重大变更：目标库切换**
+
+### 变更
+- 目标库从 GaussDB B 兼容模式改为**瀚高（HighGo）v4.1.5**（基于 PostgreSQL 内核）
+- 引入厂家 MySQL 函数兼容脚本，在目标库 DB 层抹平常用 MySQL 函数
+- 全部 references / SOP / Skills / templates / checklists 重写以适配新目标库
+- 重命名 5 份核心文档（`gaussdb-*` → `highgo-*`）
+- 新增 2 份决策（`target-db-highgo-v4` / `use-vendor-mysql-compat-functions`，后者含脚本版本管理策略）
+- 废弃 1 份决策（`why-b-compat-mode`，置 superseded）
+- Flyway 目录约定 `db/migration/gaussdb/` → `db/migration/highgo/`
+- Profile 命名 `integration-gaussdb` → `integration-highgo`
+- 改造分支约定 `feature/db-migration-gaussdb` → `feature/db-migration-highgo`
+
+### 新增
+- `docs/references/highgo-v4-compatibility.md`（瀚高 v4.1.5 特性详解）
+- `docs/references/highgo-v4.1.5-mysql-compat-functions.sql`（厂家脚本 + 版本标记函数）
+- `docs/references/highgo-v4.1.5-mysql-compat-functions.md`（脚本说明与缺口）
+- `project-docs/plans/2026-04-21-pivot-to-highgo.md`（本整改计划）
+- `project-docs/plans/2026-04-21-pilot-smoke-test.md`（Pilot 烟测清单）
+
+### 风险
+- 新增 R-017 脚本版本管理
+- 新增 R-018 Flyway 防护语法在瀚高下的兼容性
+
+### 迁移指引
+- 使用 v0.1.x 的消费方工程升级路径：由本工具包 Pilot 验证后单独发布
+- Tag 见 Task 19 打
+
 ## v0.1.0 — 2026-04-18
 
 首发骨架版。

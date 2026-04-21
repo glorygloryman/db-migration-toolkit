@@ -1,6 +1,6 @@
 # db-migration-toolkit
 
-MySQL → GaussDB（及其他关系型数据库）改造通用工具包。
+MySQL → 瀚高（HighGo v4.1.5）改造通用工具包。
 
 ## 目标
 
@@ -12,7 +12,7 @@ MySQL → GaussDB（及其他关系型数据库）改造通用工具包。
 
 ## 当前版本
 
-v0.1.0（2026-04-18 首发，骨架版，待 Pilot 验证后迭代至 v1.0.0）
+v0.2.0（2026-04-21 目标库切换版，骨架版，待 Pilot 验证）
 
 ## 目录结构
 
@@ -51,13 +51,14 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 | `db-migration-baseline` | 产出前置调研三件套 | Stage 0 |
 | `db-migration-sql-scan` | 扫描 MySQL 特性用法，生成风险矩阵 | Stage 0 |
 | `db-migration-test-gap` | 对比 Mapper 方法 vs 测试覆盖 | Stage 1 |
-| `db-migration-schema-convert` | 生成 GaussDB DDL 对照稿 | Stage 3 |
+| `db-migration-schema-convert` | 生成瀚高 DDL 对照稿 | Stage 3 |
 | `db-migration-dialect-rewrite` | 方言差异建议改写（不自动改码） | Stage 4 |
 | `db-migration-verify` | 跑测试 + 生成验收报告骨架 | Stage 5 |
 
 ## 前提假设
 
-- **目标数据库**：GaussDB，**B 兼容模式（MySQL 兼容）**
+- **目标数据库**：瀚高（HighGo）**v4.1.5**（PostgreSQL 系，非 GaussDB）
+- **兼容策略**：PG 方言为基础 + 厂家 MySQL 函数兼容脚本（见 `docs/references/highgo-v4.1.5-mysql-compat-functions.md`）
 - **不做数据迁移**，仅做程序适配
 - **不改架构**，保留 MyBatis / JPA / JdbcTemplate 原结构
 - **集成测试使用本地/共享真实数据库**，禁用 Testcontainers 与 `@MockBean`
@@ -71,5 +72,6 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 ## 参考入口
 
 - 总方案：[`docs/2026-04-18-master-plan.md`](docs/2026-04-18-master-plan.md)
-- 兼容模式详解：[`docs/references/gaussdb-compatibility-modes.md`](docs/references/gaussdb-compatibility-modes.md)
-- 已知风险：[`docs/risks/known-risks-gaussdb.md`](docs/risks/known-risks-gaussdb.md)
+- 瀚高 v4.1.5 特性详解：[`docs/references/highgo-v4-compatibility.md`](docs/references/highgo-v4-compatibility.md)
+- MySQL 函数兼容脚本说明：[`docs/references/highgo-v4.1.5-mysql-compat-functions.md`](docs/references/highgo-v4.1.5-mysql-compat-functions.md)
+- 已知风险：[`docs/risks/known-risks-highgo.md`](docs/risks/known-risks-highgo.md)
