@@ -1,0 +1,57 @@
+# 本工具包 project-docs 索引
+# 遵循 ~/.claude/CLAUDE.md §5 文档治理协议 v2026-04-06-v2
+# 仅索引 project-docs/ 下的元治理文档；产品文档索引见 docs/ 自有入口
+
+version: 1
+updated: 2026-04-21
+
+entries:
+  - path: project-docs/plans/2026-04-21-v1.0.0-roadmap.md
+    type: plan
+    title: v1.0.0 路线图与 Pilot 出口条件
+    summary: 从骨架版 v0.1.0 迭代到稳定版 v1.0.0 的阶段划分、Pilot 验证要求与出口标准
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/plans/2026-04-21-pivot-to-highgo.md
+    type: plan
+    title: 目标库切换（GaussDB → 瀚高 v4.1.5）文档整改实施方案 v2
+    summary: 19 Task 分 8 阶段，含脚本迁移、决策废立、references 重写、SOP/templates/checklists/Skills 重整、残留扫描与 Pilot 烟测
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/decisions/2026-04-21-target-db-highgo-v4.md
+    type: decision
+    title: 目标库改为瀚高 v4.1.5
+    summary: 项目真实目标库为瀚高 v4.1.5 而非 GaussDB；方言按 PG 基础 + 厂家 MySQL 函数兼容脚本抹平
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/decisions/2026-04-21-use-vendor-mysql-compat-functions.md
+    type: decision
+    title: 使用厂家 MySQL 函数兼容脚本
+    summary: 注入厂家脚本在 DB 层抹平 MySQL 函数，应用层免改；已知缺口用 CASE WHEN / COALESCE 兜底；含脚本版本管理策略
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/decisions/2026-04-21-why-b-compat-mode.md
+    type: decision
+    title: 为什么选 GaussDB B 兼容模式而非 PG 模式
+    summary: "[已废弃，见 target-db-highgo-v4] B 兼容模式对 MySQL 语法原生支持更完整，预估改造量下降 60~80%——假设目标库为 GaussDB，2026-04-21 切换瀚高后此决策废弃"
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/decisions/2026-04-21-skill-symlink-distribution.md
+    type: decision
+    title: 为什么用软链而非复制/包管理分发 Skills
+    summary: 软链保证一处修改全局生效，避免 20+ 工程版本漂移；代价是对消费方目录结构有假设
+    created: 2026-04-21
+    updated: 2026-04-21
+
+  - path: project-docs/facts/2026-04-21-consumer-projects-inventory.md
+    type: fact
+    title: xz-source 消费方工程清单
+    summary: 本工具包覆盖的 33 个 Java/Spring Boot 工程清单、当前接入状态与 Pilot 标记
+    created: 2026-04-21
+    updated: 2026-04-21
+    expires_hint: 30d
