@@ -149,7 +149,7 @@
 ## 处理原则
 
 1. **先查脚本覆盖**：任何 MySQL 函数出现在业务 SQL 中，先确认 `highgo-v4.1.5-mysql-compat-functions.md` 是否覆盖；覆盖则免改，直接引用脚本部署结果。
-2. **脚本缺口必须记录**：一旦发现脚本未覆盖的类型重载或异常行为缺口，写入本工程 `docs/risks/known-risks-gaussdb.md`（已更名语境下对应的瀚高风险矩阵）与 `fix-issue/`，不要靠记忆。
+2. **脚本缺口必须记录**：一旦发现脚本未覆盖的类型重载或异常行为缺口，写入 `docs/risks/known-risks-highgo.md` 与 `fix-issue/`，不要靠记忆。
 3. **PG 原生等价逐条改写**：对 🔄 项，严格按本表目标写法改写，避免自造函数重复造轮子。
 4. **不可用的 Fallback**：脚本未覆盖且 PG 也无等价的（如 `JSON_SEARCH`、`TIMESTAMPDIFF`），优先在 SQL 层用 `jsonb_path_query` 等原生扩展实现；仍不可行则上移到 Java 层处理。
 5. **所有 ⚠️ Pilot 必测**：凡打了 ⚠️ 的条目（含脚本覆盖但有已知行为差异的 🛡️⚠️ 项），Pilot 阶段单列测试用例，覆盖边界、NULL、类型转换、并发等场景，通过后方可扩大范围。

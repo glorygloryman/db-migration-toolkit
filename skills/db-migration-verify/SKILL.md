@@ -103,7 +103,7 @@ SELECT index_name FROM information_schema.statistics WHERE table_schema = '<sche
 执行以下检查并记入报告 §6：
 
 ```sql
-SELECT highgo_compat_version();
+SELECT mysql_compat_version();
 ```
 
 对比：
