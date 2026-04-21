@@ -1,10 +1,12 @@
-# MySQL → GaussDB 通用改造母方案
+# MySQL → 瀚高 v4.1.5 通用改造母方案
 
-- **版本**：v0.1.0
-- **日期**：2026-04-18
+- **版本**：v0.2.0（2026-04-21 目标库切换版）
+- **首发日期**：2026-04-18
 - **状态**：DRAFT（骨架版，待 Pilot 验证）
 - **适用范围**：`xz-source/` 下所有使用 MySQL 的 Java / Spring Boot 工程
-- **目标数据库**：GaussDB，**B 兼容模式（MySQL 兼容）**
+- **目标数据库**：**瀚高（HighGo）v4.1.5**（PostgreSQL 系，非 GaussDB）
+- **兼容策略**：PG 方言为基础 + 厂家 MySQL 函数兼容脚本（见 [`references/highgo-v4.1.5-mysql-compat-functions.md`](references/highgo-v4.1.5-mysql-compat-functions.md)）
+- **目标切换说明**：原目标库 GaussDB B 兼容模式已废弃，详见 [`project-docs/decisions/2026-04-21-target-db-highgo-v4.md`](../project-docs/decisions/2026-04-21-target-db-highgo-v4.md)
 
 ---
 
@@ -21,19 +23,27 @@
 5. **按工程独立推进**，每个工程产出同构的验收报告
 6. **踩坑即回灌**：每次 Pilot 发现问题，同步写入 `fix-issue/` 与相关 references
 
-### 1.2 B 兼容模式下的改造量预估
+### 1.2 改造量预估
 
-因 GaussDB B 模式原生兼容大量 MySQL 语法（反引号、`LIMIT m,n`、`ON DUPLICATE KEY UPDATE`、`AUTO_INCREMENT`、`GROUP_CONCAT`、`IFNULL`、`DATE_FORMAT`、`TINYINT(1)` 等），Stage 4（方言适配）工作量较 PG 模式下降 60%~80%。
+瀚高 v4.1.5 基于 PostgreSQL 内核，**方言层接近原生 PG**。改造量分两部分：
 
-**但仍需验证的差异点**（详见 `references/gaussdb-compatibility-modes.md`）：
-- JDBC 驱动（`gaussdbjdbc`，非 `mysql-connector`）
-- 连接池 SQL Parser（Druid `dbType`）
-- 字符集与排序规则
-- 时区处理与 `TIMESTAMP` 语义
-- 保留字清单（与 MySQL 有差异）
-- 部分边缘函数行为
-- 存储过程 / 触发器语法（若工程使用）
-- 执行计划与性能特征
+**A. 函数层（多数可免改）**：厂家提供 MySQL 函数兼容脚本，一次性注入目标库后，以下 MySQL 函数可保持原样不改：
+`IFNULL` / `IF()` / `DATE_FORMAT` / `STR_TO_DATE` / `FIND_IN_SET` / `CURDATE` / `YEAR` / `MONTH` / `DAYOFYEAR` / `LAST_DAY` / `TRUNCATE` / `TO_DAYS` 等（清单见 [`references/highgo-v4.1.5-mysql-compat-functions.md`](references/highgo-v4.1.5-mysql-compat-functions.md)）。
+⚠️ **已知缺口**：`IFNULL` 无 timestamp 重载、`IF` 无 int/text 重载、`DATE_FORMAT` 实现存在递归风险（Pilot 必验）。
+
+**B. 语法层（必须逐条改写）**：脚本无能为力的部分，Stage 4 工作量集中于此：
+- 标识符反引号 `` `col` `` → 双引号 `"col"` 或全小写无歧义
+- `LIMIT offset, count` → `LIMIT count OFFSET offset`
+- `ON DUPLICATE KEY UPDATE` → `INSERT ... ON CONFLICT ... DO UPDATE`
+- `REPLACE INTO` → `INSERT ... ON CONFLICT ... DO UPDATE` 或 `DELETE + INSERT`
+- `UPDATE/DELETE ... LIMIT n`（PG 不支持，需改写）
+- `UPDATE t1 JOIN t2 SET ...`（PG 用 `UPDATE ... FROM ...`）
+- MySQL Hint（`STRAIGHT_JOIN` / `USE INDEX`）→ 去除，让 PG 优化器决定
+- 存储过程 / 触发器（如使用）→ 优先上移 Java 层
+
+**C. 其他必验证项**（见 [`references/highgo-v4-compatibility.md`](references/highgo-v4-compatibility.md)）：JDBC 驱动坐标、JDBC URL scheme、Druid `dbType`、字符集、时区 `TIMESTAMP` 语义、保留字清单、大小写行为、MVCC 下 `FOR UPDATE` 行为、执行计划差异。
+
+**改造量数字**：⚠️ **待 Pilot 校准**。定性估计——相较"假想的 GaussDB B 模式"路径，真实瀚高路径的 Stage 4 工作量显著增加；但相较"完全无兼容 shim 的纯 PG"路径，函数层的全量免改仍能节省改写量。具体百分比由 Pilot 实测回填本节。
 
 ---
 
@@ -44,9 +54,9 @@
 | Stage 0 | 立项与基线 | 0.5 天 | 前置调研三件套 | [`sop/stage-0-kickoff.md`](sop/stage-0-kickoff.md) |
 | Stage 1 | 测试兜底 | 1~3 天 | 关键路径测试覆盖 + MySQL 下基线快照 | [`sop/stage-1-test-baseline.md`](sop/stage-1-test-baseline.md) |
 | Stage 2 | 依赖与配置切换 | 0.5 天 | 驱动 / 连接池 / 方言 / Flyway 配置切换 | [`sop/stage-2-config-switch.md`](sop/stage-2-config-switch.md) |
-| Stage 3 | Schema 迁移 | 1~2 天 | Flyway 新建 gaussdb 目录 + DDL 脚本 | [`sop/stage-3-schema-migration.md`](sop/stage-3-schema-migration.md) |
+| Stage 3 | Schema 迁移 | 1~2 天 | Flyway 新建 highgo 目录 + DDL 脚本 | [`sop/stage-3-schema-migration.md`](sop/stage-3-schema-migration.md) |
 | Stage 4 | SQL 方言适配 | 按扫描报告排期 | 分类别 commit，每类测试绿 | [`sop/stage-4-dialect-adapt.md`](sop/stage-4-dialect-adapt.md) |
-| Stage 5 | 回归与交付 | 0.5~1 天 | GaussDB 下全绿 + 验收报告 | [`sop/stage-5-verify-deliver.md`](sop/stage-5-verify-deliver.md) |
+| Stage 5 | 回归与交付 | 0.5~1 天 | 瀚高下全绿 + 验收报告 | [`sop/stage-5-verify-deliver.md`](sop/stage-5-verify-deliver.md) |
 
 ---
 
@@ -69,7 +79,7 @@
 | `db-migration-baseline` | Stage 0 | 扫描工程，生成前置调研三件套骨架 |
 | `db-migration-sql-scan` | Stage 0 | 基于正则 + 人工 review 扫描 MySQL 特性用法 |
 | `db-migration-test-gap` | Stage 1 | 对比 Mapper 方法与测试覆盖，输出补测清单 |
-| `db-migration-schema-convert` | Stage 3 | 生成 GaussDB DDL 对照稿 |
+| `db-migration-schema-convert` | Stage 3 | 生成瀚高 DDL 对照稿 |
 | `db-migration-dialect-rewrite` | Stage 4 | 针对差异点给出建议改写 diff（不自动改码） |
 | `db-migration-verify` | Stage 5 | 跑测试 + 生成验收报告骨架 |
 
@@ -87,16 +97,17 @@
 
 ## 6. 对照参考库
 
-- [类型映射表](references/mysql-to-gaussdb-type-mapping.md)
-- [语法映射表](references/mysql-to-gaussdb-syntax-mapping.md)
-- [函数映射表](references/mysql-to-gaussdb-function-mapping.md)
-- [兼容模式详解](references/gaussdb-compatibility-modes.md)
+- [类型映射表](references/mysql-to-highgo-type-mapping.md)
+- [语法映射表](references/mysql-to-highgo-syntax-mapping.md)
+- [函数映射表](references/mysql-to-highgo-function-mapping.md)
+- [瀚高 v4.1.5 特性详解](references/highgo-v4-compatibility.md)
+- [MySQL 函数兼容脚本说明](references/highgo-v4.1.5-mysql-compat-functions.md)
 
 ---
 
 ## 7. 风险库
 
-- [GaussDB 已知风险](risks/known-risks-gaussdb.md)
+- [瀚高 v4.1.5 已知风险](risks/known-risks-highgo.md)
 - 各工程 Pilot 发现的新风险 → 同步回灌到 `fix-issue/`
 
 ---
@@ -122,9 +133,9 @@
 ## 9. 命名约定
 
 - 日期前缀：所有工程文档 `YYYY-MM-DD-*.md`（遵循 CLAUDE.md §4）
-- Flyway 脚本：`V{timestamp}__gaussdb_{description}.sql`，置于 `db/migration/gaussdb/`
-- 改造分支：`feature/db-migration-gaussdb`
-- 集成测试 profile：`integration-gaussdb` / `integration-mysql-baseline`
+- Flyway 脚本：`V{timestamp}__highgo_{description}.sql`，置于 `db/migration/highgo/`
+- 改造分支：`feature/db-migration-highgo`
+- 集成测试 profile：`integration-highgo` / `integration-mysql-baseline`
 
 ---
 
