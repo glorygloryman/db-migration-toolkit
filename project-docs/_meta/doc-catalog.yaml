@@ -20,6 +20,13 @@ entries:
     created: 2026-04-21
     updated: 2026-04-21
 
+  - path: project-docs/plans/2026-04-21-pilot-smoke-test.md
+    type: plan
+    title: Pilot 工程烟测清单（整改后首日验证）
+    summary: 整改完成后由 Pilot 工程 stream_keywords_search 执行的 S1-S8 烟测步骤、C1-C10 待确认项核实清单与出口标准
+    created: 2026-04-21
+    updated: 2026-04-21
+
   - path: project-docs/decisions/2026-04-21-target-db-highgo-v4.md
     type: decision
     title: 目标库改为瀚高 v4.1.5
