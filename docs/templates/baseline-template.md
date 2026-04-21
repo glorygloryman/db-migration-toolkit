@@ -8,11 +8,12 @@ stage: 0-kickoff
 
 ## 1. 目标库信息
 
-- **目标数据库**：GaussDB
-- **版本**：<填写>
-- **兼容模式**：B（MySQL 兼容）
-- **部署形态**：集中式 / 分布式 / DWS（选一）
-- **JDBC 驱动**：`com.huawei.gaussdb:gaussdbjdbc:<版本>`
+- **目标数据库**：瀚高（HighGo）v4.1.5
+- **版本**：v4.1.5（暂定，C1 待核实）
+- **内核**：基于 PostgreSQL（具体内核版本 ⚠️ 待核实）
+- **部署形态**：单机 / 集群（选一）
+- **JDBC 驱动**：`<待确认-瀚高-jdbc-坐标>:<版本>`（C2）
+- **MySQL 兼容脚本版本**：注入后执行 `SELECT mysql_compat_version()` 填写，示例 `1.0.0-highgo-v4.1.5-vendor-2026-04-21`（R-017）
 - **测试环境连接**：host=<占位>, port=<占位>, db=<占位>，凭据见内部配置
 - **与生产区别**：<如有>
 
@@ -23,7 +24,7 @@ stage: 0-kickoff
 | ORM 框架 | MyBatis / MyBatis-Plus / JPA / JdbcTemplate（可多选） |
 | ORM 版本 | |
 | 分页插件 | PageHelper / MP `PaginationInnerInterceptor` / 自研 |
-| 分页方言（当前） | mysql |
+| 分页方言（改造后目标） | postgresql |
 | 连接池 | Druid / HikariCP |
 | 连接池版本 | |
 | Flyway / Liquibase | 启用 / 未启用 |

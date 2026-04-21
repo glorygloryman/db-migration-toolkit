@@ -36,9 +36,9 @@ stage: 0-kickoff
 ## 4. 测试基础设施缺口
 
 - [ ] 本地 MySQL 实例
-- [ ] 本地 GaussDB 实例 / 可访问共享测试库
+- [ ] 本地瀚高 v4.1.5 实例 / 可访问共享测试库（已注入 MySQL 兼容脚本）
 - [ ] `application-integration-mysql-baseline.yml`
-- [ ] `application-integration-gaussdb.yml`
+- [ ] `application-integration-highgo.yml`
 - [ ] 测试造数工具（SQL / `@Sql` / 工具类）
 - [ ] 测试后清理机制
 

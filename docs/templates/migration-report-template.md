@@ -4,14 +4,14 @@ project: <工程名>
 stage: 5-verify-deliver
 ---
 
-# <工程名> GaussDB 改造验收报告
+# <工程名> 瀚高 v4.1.5 改造验收报告
 
 ## 1. 工程基本信息
 
 - **工程名**：
 - **仓库路径**：
-- **改造分支**：`feature/db-migration-gaussdb`
-- **改造版本 tag**：`stage-5-gaussdb-migration-done-vX.Y.Z`
+- **改造分支**：`feature/db-migration-highgo`
+- **改造版本 tag**：`stage-5-highgo-migration-done-vX.Y.Z`
 - **负责人**：
 - **改造起止日期**：YYYY-MM-DD ~ YYYY-MM-DD
 
@@ -57,7 +57,7 @@ stage: 5-verify-deliver
 
 ## 5. 测试对比
 
-| 维度 | MySQL 基线（Stage 1） | GaussDB（Stage 5） | 差异说明 |
+| 维度 | MySQL 基线（Stage 1） | 瀚高 v4.1.5（Stage 5） | 差异说明 |
 |------|----------------------|-------------------|---------|
 | 单元测试类数 | | | |
 | 单元测试方法数 | | | |
@@ -67,7 +67,7 @@ stage: 5-verify-deliver
 | 运行耗时 | | | |
 
 用例数差异（如有）逐一说明：
-- 新增（GaussDB 特有）：
+- 新增（瀚高特有）：
 - 删除（MySQL 特有，已下线）：
 - 调整（断言变化）：
 
