@@ -62,3 +62,10 @@ entries:
     created: 2026-04-21
     updated: 2026-04-21
     expires_hint: 30d
+
+  - path: project-docs/domain/2026-04-21-瀚高国产化改造标准业务流程.md
+    type: domain
+    title: 瀚高国产化改造标准业务流程
+    summary: 六阶段业务流程的角色划分、阶段语义、状态流转、异常路径与完整示例（Pilot 视角）；不含技术实现细节
+    created: 2026-04-21
+    updated: 2026-04-21
