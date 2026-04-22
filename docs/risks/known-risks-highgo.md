@@ -97,6 +97,13 @@
 - 复杂分页场景重点回归
 - 差异记录到 `fix-issue/`
 
+**PageHelper 版本验证**（per propagation-billboard，2026-04-22）：
+- pagehelper-spring-boot-starter 1.2.12 的实际核心版本为 pagehelper 5.1.4
+- 反编译确认：内置 `postgresql → HsqldbDialect` 映射，使用标准 LIMIT/OFFSET，对 PG 语义正确
+- ⚠️ `fromJdbcUrl()` 自动检测通过匹配 `:key:` 模式识别 URL，`jdbc:highgo://` 不包含 `:postgresql:`，**自动检测会失败**
+- **必须显式配置**：`pagehelper.helperDialect=postgresql`
+- 若不显式配置，PageHelper 将无法识别方言，分页 SQL 不被改写，直接透传给瀚高导致语法错误
+
 ## R-009 🟡 JSON 函数迁移量
 
 **风险**：MySQL `JSON_EXTRACT` / `->` / `->>` 的路径语法（`$.a.b[0]`）与瀚高（PG 系）的 `#>` / `jsonb_path_query` 路径语法（`{a,b,0}` 或 jsonpath）完全不同，不是简单替换。
@@ -218,6 +225,22 @@
 - `ADD CONSTRAINT` 替代方案：`DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_constraint WHERE conname='xxx') THEN ALTER TABLE ... ADD CONSTRAINT xxx ...; END IF; END $$;`
 - 实测失败的具体场景记录到 `fix-issue/`
 - 新迁移脚本模板预置瀚高可用的防护写法
+
+## R-019 🟢 TRS 内部 BaseMybatisRepository 兼容性（✅ 已验证无风险）
+
+**风险**：baseline 扫描会将继承了 TRS 内部 `BaseMybatisRepository` 的 Mapper 标记为阻塞项，要求确认基类是否含 MySQL 特有逻辑。
+
+**实际判定**：✅ 无兼容风险，无需人工排查。
+
+**验证依据**：
+- 反编译 `media_base_web_mybatis-1.3.46.jar`，确认 `BaseMybatisRepository` 仅继承 `BaseMapper<T>` + `BaseMybatisDao<T, ID>`
+- 所有方法为 default 实现的标准 MyBatis-Plus CRUD，无 MySQL 特有逻辑
+- 适用范围：所有继承该基类的 Mapper 接口
+
+**缓解**：
+- baseline 扫描命中此依赖时，引用本条目直接标记为"已验证兼容"跳过
+
+**来源**：propagation-billboard，2026-04-22
 
 ---
 

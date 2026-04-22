@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.1 — 2026-04-22
+
+**Pilot 知识回灌：propagation-billboard 基线调研结论**
+
+### 风险
+- R-008 增强：补充 PageHelper 5.1.4 版本验证细节（自动检测失败，必须显式配置 `helperDialect=postgresql`）
+- 新增 R-019：TRS 内部 `BaseMybatisRepository`（media_base_web_mybatis 1.3.46）经反编译验证无兼容风险，baseline 扫描命中时可跳过
+
 ## v0.2.0 — 2026-04-21
 
 **重大变更：目标库切换**
