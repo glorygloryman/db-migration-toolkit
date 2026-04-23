@@ -6,7 +6,10 @@
 
 ### 风险
 - R-008 增强：补充 PageHelper 5.1.4 版本验证细节（自动检测失败，必须显式配置 `helperDialect=postgresql`）
-- 新增 R-019：TRS 内部 `BaseMybatisRepository`（media_base_web_mybatis 1.3.46）经反编译验证无兼容风险，baseline 扫描命中时可跳过
+- 新增 R-019：TRS 内部 `BaseMybatisRepository`TRS 内部 BaseMybatisRepository 在瀚高下的兼容性放行规则
+
+### fix-issue
+- 新增 `fix-issue/2026-04-22-trs-basemybatis-repository-compat.md`：R-019 配套放行规则（放行条件 / 一票否决 / 自动判定），供 baseline 扫描器引用
 
 ## v0.2.0 — 2026-04-21
 

@@ -230,15 +230,21 @@
 
 **风险**：baseline 扫描会将继承了 TRS 内部 `BaseMybatisRepository` 的 Mapper 标记为阻塞项，要求确认基类是否含 MySQL 特有逻辑。
 
-**实际判定**：✅ 无兼容风险，无需人工排查。
-
 **验证依据**：
 - 反编译 `media_base_web_mybatis-1.3.46.jar`，确认 `BaseMybatisRepository` 仅继承 `BaseMapper<T>` + `BaseMybatisDao<T, ID>`
 - 所有方法为 default 实现的标准 MyBatis-Plus CRUD，无 MySQL 特有逻辑
 - 适用范围：所有继承该基类的 Mapper 接口
 
+⚠️ 但需注意：
+
+调用层 Wrapper 中的 SQL 片段（last/apply）不在此保障范围
+BaseMybatisDao 若存在自定义 SQL 需单独确认
+分页插件 DbType 必须切换为 POSTGRE_SQL
+
+👉 因此本项结论适用于“标准 CRUD 路径”，不覆盖扩展 SQL 场景。
+
 **缓解**：
-- baseline 扫描命中此依赖时，引用本条目直接标记为"已验证兼容"跳过
+- baseline 扫描命中此依赖时，若符合标准 CRUD 路径，引用本条目直接标记为"已验证兼容"跳过
 
 **来源**：propagation-billboard，2026-04-22
 
