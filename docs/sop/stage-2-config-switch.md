@@ -27,14 +27,18 @@
 ```xml
 <!-- 瀚高 JDBC 驱动 -->
 <dependency>
-  <!-- 待确认坐标，从厂家获取后回填 -->
-  <groupId><待确认-瀚高-jdbc-坐标></groupId>
-  <artifactId><待确认-瀚高-jdbc-坐标></artifactId>
-  <version><待确认-瀚高-jdbc-坐标></version>
+  <groupId>com.highgo</groupId>
+  <artifactId>HgdbJdbc</artifactId>
+  <!-- 版本号需项目确认；以下为本地测试验证版本，非最终指定版本 -->
+  <version>6.2.3</version>
 </dependency>
 ```
 
-**注意**：瀚高驱动通常**不在 Maven 中央仓库**，需通过公司内部 Nexus 或 `mvn install:install-file` 将 jar 装入本地仓库。坐标与驱动类名确认后回填占位符；这一步如遇阻塞，记录到 `project-docs/fix-issue/`。
+**注意**：
+- 瀚高驱动通常**不在 Maven 中央仓库**，需通过公司内部 Nexus 或 `mvn install:install-file` 将 jar 装入本地仓库
+- `6.2.3` 为本地测试验证版本，**项目最终使用版本待指定**；确认后替换上述 version 标签
+- 驱动类名：`com.highgo.jdbc.Driver`
+- 如遇阻塞，记录到 `project-docs/fix-issue/`
 
 ### 2.2 多 profile 配置
 
@@ -50,10 +54,19 @@
 ```yaml
 spring:
   datasource:
-    driver-class-name: <待确认-瀚高-驱动类>
-    url: jdbc:highgo://host:port/db?currentSchema=xxx&characterEncoding=UTF-8
+    driver-class-name: com.highgo.jdbc.Driver
+    url: jdbc:highgo://host:port/db?currentSchema=schema_name
     username: xxx
     password: xxx
+```
+
+或 properties 格式（已验证）：
+
+```properties
+spring.datasource.driver-class-name=com.highgo.jdbc.Driver
+spring.datasource.url=jdbc:highgo://0.0.0.0:5866/propagation_billboard?currentSchema=propagation_billboard
+spring.datasource.username=xxx
+spring.datasource.password=xxx
 ```
 
 ### 2.3 连接池方言适配
@@ -76,6 +89,12 @@ spring:
 ```yaml
 pagehelper:
   helper-dialect: postgresql
+```
+
+或 properties 格式（已验证）：
+
+```properties
+pagehelper.helperDialect=postgresql
 ```
 
 **MyBatis-Plus PaginationInnerInterceptor**：
@@ -184,7 +203,7 @@ mvn -P integration-highgo spring-boot:run
 
 启动失败的常见原因：
 
-- 驱动类名错误 → 回到 §2.1 校对 `<待确认-瀚高-驱动类>`
+- 驱动类名错误 → 回到 §2.1 校对 `com.highgo.jdbc.Driver`
 - Druid 不识别瀚高 → `db-type` 设为 `postgresql`
 - Flyway baseline 报错 → 确认 `baseline-on-migrate: true` 与 `baseline-version`
 - 兼容脚本注入失败 → 回到 §2.6 检查方式 A 是否已执行，或 `V0_0_1` 是否被 Flyway 扫描到
@@ -193,7 +212,7 @@ mvn -P integration-highgo spring-boot:run
 
 ## 出口检查
 
-- [ ] `pom.xml` 同时含 MySQL 与瀚高驱动（坐标占位符已回填真实值）
+- [ ] `pom.xml` 同时含 MySQL 与瀚高驱动（坐标已回填，版本号为项目确认值）
 - [ ] 两份 `application-integration-*.yml` 可独立运行
 - [ ] Druid / HikariCP / PageHelper / MyBatis-Plus 方言参数已切到 `postgresql` / `POSTGRE_SQL`
 - [ ] `db/migration/highgo/` 目录已创建，历史 `db/migration/mysql/` 脚本未动

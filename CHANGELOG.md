@@ -18,6 +18,10 @@
 
 ### SOP
 - `docs/sop/stage-4-dialect-adapt.md` 4.1 分类表新增两行：隐式类型转换（R-020）、双引号字符串字面量
+- `docs/sop/stage-2-config-switch.md` §2.1 回填 JDBC 驱动坐标（`com.highgo:HgdbJdbc:6.2.3`，本地测试版本，项目最终版本待指定）
+- `docs/sop/stage-2-config-switch.md` §2.2 回填驱动类名 `com.highgo.jdbc.Driver`、JDBC URL 格式、properties 格式示例
+- `docs/sop/stage-2-config-switch.md` §2.4 补充 PageHelper properties 格式示例
+- `docs/sop/stage-2-config-switch.md` 移除全部 `<待确认-...>` 占位符，出口检查措辞同步更新
 
 ### fix-issue
 - 新增 `fix-issue/2026-04-27-highgo-chinese-error-safequery.md`：瀚高中文报错导致集成测试 safeQuery 跳过逻辑失效，含修复代码示例
