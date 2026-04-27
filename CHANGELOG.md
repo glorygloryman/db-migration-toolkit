@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.2.2 — 2026-04-27
+
+**Pilot 知识回灌：propagation-billboard 方言适配阶段发现**
+
+### 风险
+- 新增 R-020 🟡：PG 严格类型检查导致隐式转型失效（`int LIKE`/`LEFT(int)`/`string=int` 等跨类型操作报错，约 10+ 处）
+- R-005 增强：补充瀚高中文 locale 下报错信息为中文（如 `关系 "xxx" 不存在`），集成测试 safeQuery 需兼容中英文匹配
+
+### 语法映射
+- `docs/references/mysql-to-highgo-syntax-mapping.md` §1 新增：双引号字符串字面量（`"0000"` / `"%"`）在 PG 中被当标识符，必须改单引号
+- `docs/references/mysql-to-highgo-syntax-mapping.md` §4 新增：隐式类型转换（MySQL 自动转型 vs PG 严格检查），含 `::TEXT` / `::INT` 改写策略
+
+### Skill
+- `skills/db-migration-dialect-rewrite/SKILL.md` §C 组追加：双引号字符串字面量条目
+- `skills/db-migration-dialect-rewrite/SKILL.md` §D 组追加：隐式转型缺失条目（含 R-020 引用与排查方法）
+
+### SOP
+- `docs/sop/stage-4-dialect-adapt.md` 4.1 分类表新增两行：隐式类型转换（R-020）、双引号字符串字面量
+
+### fix-issue
+- 新增 `fix-issue/2026-04-27-highgo-chinese-error-safequery.md`：瀚高中文报错导致集成测试 safeQuery 跳过逻辑失效，含修复代码示例
+
 ## v0.2.1 — 2026-04-22
 
 **Pilot 知识回灌：propagation-billboard 基线调研结论**

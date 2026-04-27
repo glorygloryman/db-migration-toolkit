@@ -20,6 +20,7 @@
 | ---------- | ---------------- | ---- | ----------- |
 | `` `col_name` ``（反引号包裹标识符） | 不支持反引号 | ❌ | 改为双引号 `"col_name"`；或在识别安全的前提下直接去引号（见下条大小写规则） |
 | `"col_name"`（双引号标识符） | 双引号表示定界标识符 | ✅ | 语义一致；注意 MySQL 默认双引号是字符串字面量，迁移脚本需确认 `sql_mode` |
+| `"0000"` / `"%"`（双引号字符串字面量） | PG 中双引号是**标识符引用**，不是字符串 | ❌ | MySQL 允许 `"0000"` 作为字符串值，PG 会当标识符解析，报 `column "0000" does not exist`。**必须改为单引号** `'0000'` / `'%'`。排查方法：搜索 SQL 中双引号包裹的纯数字或特殊字符（非列名/表名） |
 | MySQL 保留字集合 | PG 保留字集合 | ⚠️ | 两者保留字不完全一致，例如 `user`、`group`、`order`、`type`、`desc` 等在 PG 中需谨慎；发现冲突统一使用双引号包裹 |
 | 未加引号标识符大小写 | 未加引号默认**折叠为小写** | ⚠️ | MySQL 在 Linux 默认大小写敏感但存储保留原样；PG 将 `MyTable` 折叠为 `mytable`。迁移时确认：① Java 层 ORM/映射是否显式指定列名；② 旧脚本是否误用 `"MyTable"` 产生大小写敏感表 |
 | 标识符长度 64 字符上限 | 63 字节上限 | ⚠️ | 极端长命名需缩短 |
@@ -113,6 +114,7 @@
 | `USE INDEX(...)` / `FORCE INDEX(...)` / `IGNORE INDEX(...)` | 不支持 hint 语法 | 🔄 | 去除；必要时改用 `enable_seqscan=off`、`pg_hint_plan` 扩展 |
 | 字符串拼接 `CONCAT(a,b)` | 支持 `CONCAT`，也支持 `||` | ✅ | 注意 `||` 在有 NULL 时整表达式为 NULL，与 `CONCAT` 行为不同 |
 | `IFNULL(a, b)` | `COALESCE(a, b)` | 🔄 | 通用改写为 `COALESCE` |
+| 隐式类型转换（跨类型操作） | PG 严格类型检查，不自动转型 | ❌ | MySQL 允许 `int_col LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col` 等跨类型操作；PG 直接报 `operator does not exist` 错误。改写策略：① 整数列参与 `LIKE` / `LEFT` / `RIGHT` → 加 `::TEXT`，如 `region_id::TEXT LIKE #{regionId}`；② 字符串参数与整数列比较 → 加 `::INT`，如 `#{param}::INT = int_col`（注意参数值合法性） |
 
 ---
 

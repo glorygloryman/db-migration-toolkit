@@ -49,6 +49,8 @@
 | `UPDATE/DELETE ... LIMIT n` | 批量带 LIMIT | 中 | — | ❌ 改子查询 `WHERE pk IN (SELECT ... LIMIT n)` |
 | `UPDATE t1 JOIN t2` | 多表 UPDATE | 中 | — | ❌ 改 `UPDATE t1 SET ... FROM t2 WHERE ...` |
 | 保留字列名 | `user` / `type` / `order` | 中 | — | 加双引号或改名 |
+| 隐式类型转换 | `int_col LIKE '%x%'` / `LEFT(int_col,2)='53'` / `string=int_col` | 中 | — | ❌ PG 严格类型检查；整数列参与 LIKE/LEFT/RIGHT → 加 `::TEXT`；字符串参数与整数列比较 → 加 `::INT`（R-020） |
+| 双引号字符串字面量 | `"0000"` / `"%"` 作为字符串值 | 中 | — | ❌ PG 中双引号是标识符引用，报 `column does not exist`；必须改为单引号 |
 | 函数层脚本已覆盖 | `IFNULL(int, int)` / `FIND_IN_SET` | 低 | ✅ 🛡️ | 不改，跑测试验证 |
 | 函数层脚本缺口 | `IFNULL(timestamp, timestamp)` / `IF(cond, int, int)` | 中 | ❌ | 改 `COALESCE` / `CASE WHEN` |
 | `DATE_FORMAT` 递归风险 | 所有 `DATE_FORMAT` 调用 | 高 | ⚠️ | Stage 2 已验证通过则免改；未通过需改写 `TO_CHAR` |

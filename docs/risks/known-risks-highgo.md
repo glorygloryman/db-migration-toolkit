@@ -57,11 +57,14 @@
 
 **影响**：`Table not found` / `column does not exist` 类错误。
 
+**额外注意**：瀚高（中文环境安装）的报错信息为中文，例如表不存在时报 `关系 "xxx" 不存在` 而非英文 `relation "xxx" does not exist`。集成测试框架中的错误匹配逻辑需同时兼容中英文报错信息，否则安全查询（跳过不存在表的测试）会失效。修复示例见 `fix-issue/2026-04-27-highgo-chinese-error-safequery.md`。
+
 **缓解**：
 - 统一全小写 snake_case 标识符
 - Schema 导出后全量转小写
 - Mapper XML / 代码 SQL / 动态 SQL 全量同步
 - 禁止在 DDL 中使用双引号驼峰命名
+- 集成测试中匹配报错信息时，同时兼容中英文（如 `doesn't exist` + `关系.*不存在`）
 
 ## R-006 🟡 PG 保留字与 MySQL 差异
 
@@ -225,6 +228,20 @@
 - `ADD CONSTRAINT` 替代方案：`DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_constraint WHERE conname='xxx') THEN ALTER TABLE ... ADD CONSTRAINT xxx ...; END IF; END $$;`
 - 实测失败的具体场景记录到 `fix-issue/`
 - 新迁移脚本模板预置瀚高可用的防护写法
+
+## R-020 🟡 PG 严格类型检查：隐式转型失效
+
+**风险**：MySQL 对 `integer LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col` 等跨类型操作会自动隐式转型；PG 严格检查类型，直接报类型不匹配错误。在改造中约 10+ 处出现（per propagation-billboard）。
+
+**影响**：SQL 执行报错 `operator does not exist: integer ~~ unknown` / `operator does not exist: text = integer` 等，运行时才发现。
+
+**缓解**：
+- 对 `LIKE` / `LEFT` / `RIGHT` 作用于整数列的场景，显式加 `::TEXT` 转型
+- 对字符串参数与整数列比较的场景，显式加 `::INT` 转型（注意参数值的合法性）
+- Stage 4 扫描时重点搜索：`LIKE` / `LEFT` / `RIGHT` 作用在非常量列上的调用
+- 在 `docs/references/mysql-to-highgo-syntax-mapping.md` §4 追加改写指南
+
+**来源**：propagation-billboard，commit 879b78e4、1eaf3fea，2026-04-27
 
 ## R-019 🟢 TRS 内部 BaseMybatisRepository 兼容性（✅ 已验证无风险）
 

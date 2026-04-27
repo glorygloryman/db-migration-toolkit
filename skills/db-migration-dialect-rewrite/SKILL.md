@@ -52,6 +52,7 @@ description: 针对风险矩阵中的某一类差异，给出 MySQL → 瀚高 v
 - 多表 `UPDATE t1 JOIN t2 SET ...` → 改写为 `UPDATE t1 SET ... FROM t2 WHERE ...`
 - `UPDATE ... LIMIT n` / `DELETE ... LIMIT n` → 改写为子查询 `WHERE ctid IN (SELECT ctid ... LIMIT n)`
 - Hint（`STRAIGHT_JOIN` / `USE INDEX` / `FORCE INDEX`）→ 去除，让 PG 优化器决策
+- 双引号字符串字面量 → SQL 中 `"0000"` / `"%"` 等双引号字符串必须改为单引号 `'0000'` / `'%'`，PG 中双引号是标识符引用会报 `column does not exist`。典型场景：MyBatis XML 中 `concat(left(#{param}, 2), "%")` 里的 `"%"` 须改为 `'%'`
 
 建议标签：`依赖兼容脚本：否`；动作：**必须改写 SQL**。
 
@@ -59,6 +60,7 @@ description: 针对风险矩阵中的某一类差异，给出 MySQL → 瀚高 v
 - 保留字列名（MySQL 允许但 PG 拒绝的关键字）→ 加双引号或改名
 - 大小写敏感：PG 未引用的标识符默认转小写，需统一
 - 时区敏感列：`DATETIME` vs `TIMESTAMPTZ` 语义差异
+- 隐式转型缺失（R-020）：PG 严格类型检查，MySQL 允许的跨类型操作（如 `int_col LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col`）在 PG 中报类型不匹配。改写策略：① 整数列参与 `LIKE` / `LEFT` / `RIGHT` → 加 `::TEXT`，如 `region_id::TEXT LIKE #{regionId}`；② 字符串参数与整数列比较 → 加 `::INT`，如 `#{param}::INT = int_col`（注意参数值合法性）。排查方法：搜索 Mapper XML 中 `LIKE` / `LEFT` / `RIGHT` 作用在非字符列上的调用
 
 建议标签：`依赖兼容脚本：否`；动作：**必须改写**，并评估跨 Mapper 影响面。
 

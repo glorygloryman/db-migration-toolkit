@@ -65,9 +65,7 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 
 ## 索引
 
-<!-- Pilot 后在此维护分类索引 -->
-
-暂无条目。Pilot 开始后产出。
+- [瀚高中文报错导致 safeQuery 跳过逻辑失效](2026-04-27-highgo-chinese-error-safequery.md) — 🟡 其他 | propagation-billboard | R-005
 
 ## 贡献流程
 
