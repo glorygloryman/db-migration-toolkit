@@ -229,20 +229,6 @@
 - 实测失败的具体场景记录到 `fix-issue/`
 - 新迁移脚本模板预置瀚高可用的防护写法
 
-## R-020 🟡 PG 严格类型检查：隐式转型失效
-
-**风险**：MySQL 对 `integer LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col` 等跨类型操作会自动隐式转型；PG 严格检查类型，直接报类型不匹配错误。在改造中约 10+ 处出现（per propagation-billboard）。
-
-**影响**：SQL 执行报错 `operator does not exist: integer ~~ unknown` / `operator does not exist: text = integer` 等，运行时才发现。
-
-**缓解**：
-- 对 `LIKE` / `LEFT` / `RIGHT` 作用于整数列的场景，显式加 `::TEXT` 转型
-- 对字符串参数与整数列比较的场景，显式加 `::INT` 转型（注意参数值的合法性）
-- Stage 4 扫描时重点搜索：`LIKE` / `LEFT` / `RIGHT` 作用在非常量列上的调用
-- 在 `docs/references/mysql-to-highgo-syntax-mapping.md` §4 追加改写指南
-
-**来源**：propagation-billboard，commit 879b78e4、1eaf3fea，2026-04-27
-
 ## R-019 🟢 TRS 内部 BaseMybatisRepository 兼容性（✅ 已验证无风险）
 
 **风险**：baseline 扫描会将继承了 TRS 内部 `BaseMybatisRepository` 的 Mapper 标记为阻塞项，要求确认基类是否含 MySQL 特有逻辑。
@@ -264,6 +250,39 @@ BaseMybatisDao 若存在自定义 SQL 需单独确认
 - baseline 扫描命中此依赖时，若符合标准 CRUD 路径，引用本条目直接标记为"已验证兼容"跳过
 
 **来源**：propagation-billboard，2026-04-22
+
+## R-020 🟡 PG 严格类型检查：隐式转型失效
+
+**风险**：MySQL 对 `integer LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col` 等跨类型操作会自动隐式转型；PG 严格检查类型，直接报类型不匹配错误。在改造中约 10+ 处出现（per propagation-billboard）。
+
+**影响**：SQL 执行报错 `operator does not exist: integer ~~ unknown` / `operator does not exist: text = integer` 等，运行时才发现。
+
+**缓解**：
+- 对 `LIKE` / `LEFT` / `RIGHT` 作用于整数列的场景，显式加 `::TEXT` 转型
+- 对字符串参数与整数列比较的场景，显式加 `::INT` 转型（注意参数值的合法性）
+- Stage 4 扫描时重点搜索：`LIKE` / `LEFT` / `RIGHT` 作用在非常量列上的调用
+- 在 `docs/references/mysql-to-highgo-syntax-mapping.md` §4 追加改写指南
+
+**来源**：propagation-billboard，commit 879b78e4、1eaf3fea，2026-04-27
+
+## R-021 🟡 聚合除法除零 + ROUND 类型签名双问题
+
+**风险**：MySQL 中 `ROUND(SUM(CASE WHEN ... THEN a.ceiindex ELSE 0.0 END) / SUM(CASE WHEN ... THEN 1 ELSE 0 END), 2)` 可正常运行——当分母为零时 MySQL 返回 NULL。迁移到瀚高后存在两个问题：
+1. **除零异常**：瀚高（PG 系）中 `/ 0` 直接抛 `division by zero` 异常，不会返回 NULL
+2. **ROUND 签名不匹配**：PG 的 `ROUND` 只接受 `(numeric, int)`，`ROUND(double precision, int)` 不存在，报 `function does not exist`
+
+这两个问题常**同时出现**在聚合统计 SQL 中（按维度求均值、占比等）。
+
+**影响**：查询直接报错，页面崩溃；在数据稀疏场景（某些维度值不存在）下必现除零。
+
+**缓解**：
+- **除零**：分母用 `NULLIF(分母, 0)` 包裹，使 `x / NULL` 返回 NULL（与 MySQL 行为一致）
+- **ROUND 类型**：分子或整体表达式加 `::numeric` 转型
+- **组合改写模板**：`ROUND(expr::numeric / NULLIF(denominator, 0), n)`
+- Stage 4 扫描时重点搜索：`SUM(` 后跟 `/ SUM(` 的聚合除法模式，以及 `ROUND(` 包裹除法的模式
+- 典型触发场景：按 `scene_type` / `status` 等枚举维度分组统计均值时，某维度值在结果集中不存在
+
+**来源**：propagation-billboard，2026-04-28
 
 ---
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.3 — 2026-04-28
+
+**Pilot 知识回灌：聚合除法除零 + ROUND 类型签名问题**
+
+### 风险
+- 新增 R-021 🟡：聚合除法除零 + ROUND 签名双问题（`x / 0` 在 PG 抛异常而非返回 NULL；`ROUND(double, int)` 签名不存在）
+
+### 函数映射
+- `docs/references/mysql-to-highgo-function-mapping.md` 数值节：`ROUND` 从 ✅ 修正为 ⚠️，补充 `::numeric` 转型规则与签名差异说明
+- `docs/references/mysql-to-highgo-function-mapping.md` 数值节：新增 `/` 除法运算符条目，标注除零行为差异与 `NULLIF` 改写规则
+
+### fix-issue
+- 新增 `fix-issue/2026-04-28-aggregate-division-round-type-error.md`：聚合除法除零异常 + ROUND 签名不匹配踩坑记录，含改写模板
+
 ## v0.2.2 — 2026-04-27
 
 **Pilot 知识回灌：propagation-billboard 方言适配阶段发现**

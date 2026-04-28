@@ -37,7 +37,9 @@
 
 | MySQL | 瀚高 v4.1.5 目标写法 | 脚本覆盖 | 状态 | 说明 |
 |-------|---------------------|:-------:|:----:|------|
-| `ABS` / `CEIL` / `CEILING` / `FLOOR` / `ROUND` | 同 | — | ✅ | PG 原生等价 |
+| `ABS` / `CEIL` / `CEILING` / `FLOOR` | 同 | — | ✅ | PG 原生等价 |
+| `ROUND(x, d)` | `ROUND(x::numeric, d)` | — | ⚠️ | **签名差异**：PG 的 `ROUND` 只接受 `(numeric, int)` 或 `(double precision)`（无精度参数）；MySQL `ROUND(double, int)` 在 PG 中报 `function does not exist`。**改写规则**：`ROUND(expr, n)` → `ROUND(expr::numeric, n)`，对聚合表达式尤其注意（如 `ROUND(SUM(...) / SUM(...), 2)` 需同时处理除零，见下方 `/` 除法条目） |
+| `a / b`（除法运算符） | 同，但除零行为不同 | — | ⚠️ | **除零行为差异**：MySQL `x / 0` 返回 NULL（不报错）；瀚高（PG 系）`x / 0` 直接抛 `division by zero` 异常。**改写规则**：分母可能为零时，必须用 `NULLIF(分母, 0)` 包裹，使除零返回 NULL（与 MySQL 行为一致）。典型模式：`SUM(a) / NULLIF(SUM(b), 0)`。常与 `ROUND` 组合出现，需同时加 `::numeric` |
 | `MOD(a, b)` | 脚本提供 `mod(text, int)` 等重载 | 🛡️ | ⚠️ | 脚本异常行为：MySQL 在除零时抛错，兼容脚本返回 NULL；业务若依赖报错需额外判空或包一层 |
 | `a % b` | 同（PG 运算符） | — | ✅ | 类型匹配时可直接用 |
 | `POWER` / `POW` / `SQRT` / `EXP` / `LN` / `LOG` | 同 | — | ✅ | PG 原生等价 |

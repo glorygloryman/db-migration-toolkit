@@ -63,6 +63,7 @@ private <T> T safeQuery(Supplier<T> query) {
 - 工程：propagation-billboard
 - Commit：9119d533786398515364384f6c894bf1990a6eae
 - 日期：2026-04-27
+- 记录人：吴少辉
 
 ## 参考
 
