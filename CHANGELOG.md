@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.5 — 2026-04-28
+
+**Stage 1 补测闭环：新增计划生成与逐条执行 Skill**
+
+### Skill
+- 新增 `skills/db-migration-test-plan/SKILL.md`：读取 test-gap 测试缺口清单，按模块 × 测试类型 × 优先级拆分为独立可执行的 Task 计划，产出 `test-gap-plan.md`
+- 新增 `skills/db-migration-test-execute/SKILL.md`：按 Task 编号执行补测（编写测试代码 → 运行验证 → 回写计划进度 + test-gap 覆盖状态）
+- `skills/db-migration-test-gap/SKILL.md`：后续步骤改为引导使用 `test-plan` → `test-execute` 流水线
+
+### 文档
+- 新增 `docs/templates/test-gap-plan-template.md`：执行计划产出模板
+- `CLAUDE.md`：Skill 列表补充 `stage4-plan-rewrite`、`stage4-execute-task`（之前遗漏），新增 `test-plan`、`test-execute`；Skill 写作约定补充会修改代码的 Skill 例外说明
+- `README.md`：Skills 清单表新增两个 Skill，软链命令同步补充
+
 ## v0.2.4 — 2026-04-28
 
 **Stage 4 改写闭环：新增执行计划与逐条执行 Skill**

@@ -12,7 +12,7 @@ MySQL → 瀚高（HighGo v4.1.5）改造通用工具包。
 
 ## 当前版本
 
-v0.2.0（2026-04-21 目标库切换版，骨架版，待 Pilot 验证）
+v0.2.5（2026-04-28 Stage 1 补测闭环版，骨架版，待 Pilot 验证）
 
 ## 目录结构
 
@@ -37,6 +37,8 @@ cd .claude/skills
 ln -s ../../../db-migration-toolkit/skills/db-migration-baseline .
 ln -s ../../../db-migration-toolkit/skills/db-migration-sql-scan .
 ln -s ../../../db-migration-toolkit/skills/db-migration-test-gap .
+ln -s ../../../db-migration-toolkit/skills/db-migration-test-plan .
+ln -s ../../../db-migration-toolkit/skills/db-migration-test-execute .
 ln -s ../../../db-migration-toolkit/skills/db-migration-dialect-rewrite .
 ln -s ../../../db-migration-toolkit/skills/db-migration-schema-convert .
 ln -s ../../../db-migration-toolkit/skills/db-migration-stage4-plan-rewrite .
@@ -53,6 +55,8 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 | `db-migration-baseline` | 产出前置调研三件套 | Stage 0 |
 | `db-migration-sql-scan` | 扫描 MySQL 特性用法，生成风险矩阵 | Stage 0 |
 | `db-migration-test-gap` | 对比 Mapper 方法 vs 测试覆盖 | Stage 1 |
+| `db-migration-test-plan` | 将测试缺口拆分为可执行 Task 计划 | Stage 1 |
+| `db-migration-test-execute` | 按 Task 编号执行补测、验证、回写进度 | Stage 1 |
 | `db-migration-schema-convert` | 生成瀚高 DDL 对照稿 | Stage 3 |
 | `db-migration-dialect-rewrite` | 方言差异建议改写（不自动改码） | Stage 4 |
 | `db-migration-stage4-plan-rewrite` | 将改写清单拆解为原子任务执行计划 | Stage 4 |
