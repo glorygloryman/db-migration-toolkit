@@ -39,6 +39,8 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-sql-scan .
 ln -s ../../../db-migration-toolkit/skills/db-migration-test-gap .
 ln -s ../../../db-migration-toolkit/skills/db-migration-dialect-rewrite .
 ln -s ../../../db-migration-toolkit/skills/db-migration-schema-convert .
+ln -s ../../../db-migration-toolkit/skills/db-migration-stage4-plan-rewrite .
+ln -s ../../../db-migration-toolkit/skills/db-migration-stage4-execute-task .
 ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 ```
 
@@ -53,6 +55,8 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 | `db-migration-test-gap` | 对比 Mapper 方法 vs 测试覆盖 | Stage 1 |
 | `db-migration-schema-convert` | 生成瀚高 DDL 对照稿 | Stage 3 |
 | `db-migration-dialect-rewrite` | 方言差异建议改写（不自动改码） | Stage 4 |
+| `db-migration-stage4-plan-rewrite` | 将改写清单拆解为原子任务执行计划 | Stage 4 |
+| `db-migration-stage4-execute-task` | 逐条执行改写任务 + 跑测试 + 回写进度 | Stage 4 |
 | `db-migration-verify` | 跑测试 + 生成验收报告骨架 | Stage 5 |
 
 ## 前提假设

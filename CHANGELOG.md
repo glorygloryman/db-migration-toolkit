@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.4 — 2026-04-28
+
+**Stage 4 改写闭环：新增执行计划与逐条执行 Skill**
+
+### Skill
+- 新增 `skills/db-migration-stage4-plan-rewrite/SKILL.md`：读取 stage4 改写清单文档，拆解为原子任务执行计划，生成标准化执行提示词模板，产出 `stage4-execution-plan.md`
+- 新增 `skills/db-migration-stage4-execute-task/SKILL.md`：按任务编号逐条执行改写，运行对应集成测试方法，回写执行计划进度
+- `skills/db-migration-dialect-rewrite/SKILL.md`：后续步骤新增提示，引导用户在清单生成后依次调用 `/db-migration-stage4-plan-rewrite` 和 `/db-migration-stage4-execute-task`
+
+### 文档
+- `README.md`：Skills 清单表新增两个 Skill，软链命令同步补充
+
 ## v0.2.3 — 2026-04-28
 
 **Pilot 知识回灌：聚合除法除零 + ROUND 类型签名问题**
