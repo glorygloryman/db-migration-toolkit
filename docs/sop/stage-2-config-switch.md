@@ -103,6 +103,29 @@ pagehelper.helperDialect=postgresql
 new PaginationInnerInterceptor(DbType.POSTGRE_SQL)
 ```
 
+> **Pilot 实踩**：TRS 公共依赖 `media_base_web_mybatis` 的 `TrsMybatisPlusConfig` 硬编码了 `DbType.MYSQL`，必须在工程本地覆盖该 Bean，否则瀚高 profile 下分页方言仍走 MySQL。
+
+```java
+// 示例
+@Bean
+public MybatisPlusInterceptor mybatisPlusInterceptor(Environment env) {
+    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+    interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+    interceptor.addInnerInterceptor(new PaginationInnerInterceptor(resolveDbType(env)));
+    return interceptor;
+}
+
+private DbType resolveDbType(Environment env) {
+    String url = env.getProperty("spring.datasource.url", "");
+    if (url.contains("highgo") || url.contains("postgresql")) {
+        return DbType.POSTGRE_SQL;
+    }
+    return DbType.MYSQL;
+}
+```
+
+推荐按 JDBC URL 动态识别而非硬编码 `POSTGRE_SQL`，这样 MySQL / 瀚高两套 profile 可共用同一份配置类。
+
 **说明**：瀚高基于 PG 内核，分页语法为 `LIMIT n OFFSET m`（不支持 MySQL 的 `LIMIT m, n`），分页插件必须走 PG 方言；代码侧如有裸写 `LIMIT m, n` 的地方由 Stage 4 按风险矩阵改写。
 
 ### 2.5 Flyway 目录切分

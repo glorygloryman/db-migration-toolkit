@@ -21,6 +21,7 @@
 - `docs/sop/stage-2-config-switch.md` §2.1 回填 JDBC 驱动坐标（`com.highgo:HgdbJdbc:6.2.3`，本地测试版本，项目最终版本待指定）
 - `docs/sop/stage-2-config-switch.md` §2.2 回填驱动类名 `com.highgo.jdbc.Driver`、JDBC URL 格式、properties 格式示例
 - `docs/sop/stage-2-config-switch.md` §2.4 补充 PageHelper properties 格式示例
+- `docs/sop/stage-2-config-switch.md` §2.4 MybatisPlus 分页方言改为 Pilot 验证的动态识别方案（`resolveDbType`），标注 `media_base_web_mybatis` 硬编码 `DbType.MYSQL` 的踩坑
 - `docs/sop/stage-2-config-switch.md` 移除全部 `<待确认-...>` 占位符，出口检查措辞同步更新
 
 ### fix-issue
