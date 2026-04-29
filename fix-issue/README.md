@@ -71,6 +71,8 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 - [AccountRankMapper ROUND 类型与 GROUP BY 严格模式修复](2026-04-28-account-rank-round-groupby.md) — 🟡 函数 | propagation-billboard | R-021, R-020
 - [AreaManager QueryWrapper IN 查询类型不匹配](2026-04-28-area-manager-in-query-type-mismatch.md) — 🟡 类型 | propagation-billboard | R-020
 - [ComprehensiveRankMapper 无 GROUP BY 隐式聚合 + ROUND 类型 + GROUP BY 严格模式](2026-04-28-comprehensive-rank-round-groupby.md) — 🟡 语法 | propagation-billboard | R-021, R-020
+- [HighGo DDL 可执行不等于 Flyway 启动迁移链路可用](2026-04-29-highgo-ddl-flyway-not-hard-gate.md) — 🟡 其他 | stream-keywords-search | 无
+- [多数据库测试 profile 需要隔离，避免跨库测试串入](2026-04-29-test-profile-cross-database-leak.md) — 🟡 其他 | stream-keywords-search | 无
 
 ## 贡献流程
 
