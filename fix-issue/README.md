@@ -65,8 +65,12 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 
 ## 索引
 
-- [聚合除法除零异常 + ROUND 函数签名不匹配](2026-04-28-aggregate-division-round-type-error.md) — 🟡 函数 | propagation-billboard | R-021
+- [TRS 内部 BaseMybatisRepository 在瀚高下的兼容性放行规则](2026-04-22-trs-basemybatis-repository-compat.md) — 🟢 其他 | propagation-billboard | R-019
 - [瀚高中文报错导致 safeQuery 跳过逻辑失效](2026-04-27-highgo-chinese-error-safequery.md) — 🟡 其他 | propagation-billboard | R-005
+- [聚合除法除零异常 + ROUND 函数签名不匹配](2026-04-28-aggregate-division-round-type-error.md) — 🟡 函数 | propagation-billboard | R-021
+- [AccountRankMapper ROUND 类型与 GROUP BY 严格模式修复](2026-04-28-account-rank-round-groupby.md) — 🟡 函数 | propagation-billboard | R-021, R-020
+- [AreaManager QueryWrapper IN 查询类型不匹配](2026-04-28-area-manager-in-query-type-mismatch.md) — 🟡 类型 | propagation-billboard | R-020
+- [ComprehensiveRankMapper 无 GROUP BY 隐式聚合 + ROUND 类型 + GROUP BY 严格模式](2026-04-28-comprehensive-rank-round-groupby.md) — 🟡 语法 | propagation-billboard | R-021, R-020
 
 ## 贡献流程
 

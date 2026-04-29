@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.6 — 2026-04-29
+
+**Pilot 知识回灌：ROUND/GROUP BY/类型不匹配/隐式聚合**
+
+### fix-issue
+- 新增 `fix-issue/2026-04-28-account-rank-round-groupby.md`：AccountRankMapper ROUND 类型与 GROUP BY 严格模式兼容性修复
+- 新增 `fix-issue/2026-04-28-area-manager-in-query-type-mismatch.md`：AreaManager QueryWrapper IN 查询 integer/varchar 类型不匹配
+- 新增 `fix-issue/2026-04-28-comprehensive-rank-round-groupby.md`：ComprehensiveRankMapper 无 GROUP BY 隐式聚合 + ROUND 类型 + GROUP BY 严格模式（含 `<choose>` 拆分方案与窗口函数改写）
+- `fix-issue/README.md`：索引从 2 条扩展到 6 条，按日期排序；补充之前遗漏的 `trs-basemybatis-repository-compat` 索引
+
 ## v0.2.5 — 2026-04-28
 
 **Stage 1 补测闭环：新增计划生成与逐条执行 Skill**
