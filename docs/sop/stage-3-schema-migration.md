@@ -145,12 +145,43 @@ DROP TABLE IF EXISTS _smoke_t;
 
 任一冒烟失败，记录到 `project-docs/fix-issue/` 并同步更新 `docs/references/mysql-to-highgo-syntax-mapping.md` DDL 节的"状态"列。
 
+### 3.9 回写风险矩阵中的 Stage3 承接项
+
+Stage 3 结束前必须回写 `risk-matrix.md` 中由 Schema 迁移承接的风险项，避免 DDL / Schema 风险遗留到 Stage 5 前才补关。
+
+可在 Stage 3 直接关闭的风险必须同时满足：
+
+1. 风险边界仅限 DDL / Schema 资产，不依赖 Mapper / DAO 运行时行为。
+2. Stage 3 已有直接证据，例如 schema convert report、目标 DDL 扫描、DDL asset test、schema diff 或 DDL guard smoke。
+3. 后续阶段不会再验证该风险的核心行为。
+
+典型可关闭项：
+
+- `AUTO_INCREMENT` 已映射为 identity / sequence，并验证起始值策略。
+- `ENGINE` / `DEFAULT CHARSET` / `COLLATE` / `ROW_FORMAT` 已从目标 DDL 移除。
+- 内联 `COMMENT` / 表级 `COMMENT='...'` 已转为 `COMMENT ON TABLE/COLUMN`。
+- `USING BTREE` / 内联 `KEY` 已转为目标库索引语法，并验证索引存在。
+
+以下风险不得仅凭 Stage 3 关闭，只能在备注中记录"Stage3 DDL 部分已完成"，并保留到 Stage 4 / Stage 5 真库验证后关闭：
+
+- `tinyint` / `jdbcType=TINYINT` 等同时涉及 Mapper 参数绑定的类型风险。
+- `datetime` / `timestamp` / `jdbcType=TIMESTAMP` 等时间读写语义风险。
+- `longtext` / `jdbcType=LONGVARCHAR` 等大字段读写风险。
+- 字符集 / collation 移除后仍涉及大小写、排序、`LIKE` 语义的查询风险。
+
+回写备注必须写清关闭证据，至少包含：
+
+- Stage 3 报告或决策记录路径。
+- 目标 DDL 或目标库验证结果。
+- 资产测试 / schema diff / 冒烟命令及结果。
+
 ## 出口检查
 
 - [ ] `db/migration/highgo/V*__init_schema.sql` 脚本可重复执行不报错
 - [ ] 所有表、索引、约束已建立
 - [ ] 类型映射、保留字、字符集策略已记录并应用
 - [ ] Schema 对比报告已产出，无遗漏
+- [ ] `risk-matrix.md` 中由 Stage 3 承接的 DDL / Schema 风险已回写状态与备注；跨层风险已标明 Stage 3 完成部分和后续验证阶段
 - [ ] 未修改 `db/migration/mysql/` 任何文件
 
 ## 产出物
@@ -158,6 +189,7 @@ DROP TABLE IF EXISTS _smoke_t;
 - `V*__highgo_init_schema.sql`（可能多个）
 - `project-docs/reports/YYYY-MM-DD-schema-diff.md`
 - `project-docs/decisions/YYYY-MM-DD-type-mapping-strategy.md`（本工程类型映射决策）
+- 更新后的 `risk-matrix.md`（Stage 3 承接项状态与备注）
 
 ## 下一阶段
 
