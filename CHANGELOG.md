@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.7 — 2026-04-30
+
+**Stage 1 test-plan 验收标准明确：聚焦覆盖性，不要求瀚高环境通过**
+
+### Skill
+- `skills/db-migration-test-plan/SKILL.md`：验收标准字段从模糊描述展开为三条明确的覆盖性标准（有测试用例、覆盖关键分支、MySQL 环境通过），并注明不要求瀚高环境通过
+- `skills/db-migration-test-plan/SKILL.md`：约束段新增说明 Stage 1 验收标准不包含瀚高通过，瀚高验证属于 Stage 5（`db-migration-verify`）职责
+
 ## v0.2.6 — 2026-04-29
 
 **Pilot 知识回灌：ROUND/GROUP BY/类型不匹配/隐式聚合**
