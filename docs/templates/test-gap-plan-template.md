@@ -59,6 +59,9 @@ stage: 1-test-foundation
 
 **验收标准：**
 - [ ] 所有涉及方法均有对应单元测试
+- [ ] 每个方法至少覆盖正常路径 + 边界条件 + 异常路径（最低三条）
+- [ ] 断言消息使用中文
+- [ ] 禁止 mock 被测类本身，只 mock 外部依赖
 - [ ] 测试通过 `mvn test -Dtest=<TestClass>`
 - [ ] 含 MySQL 特性的方法在测试中有注释标注
 
@@ -78,8 +81,10 @@ stage: 1-test-foundation
 
 **验收标准：**
 - [ ] 所有涉及方法均有对应集成测试
-- [ ] 测试连接真实 MySQL 数据库
+- [ ] 使用 `@ActiveProfiles("integration-mysql-baseline")`
+- [ ] 测试连接真实 MySQL 数据库（禁止 `@MockBean` 替代数据库，禁止 Testcontainers）
 - [ ] 测试数据有准备和清理机制
+- [ ] 断言消息使用中文
 - [ ] 测试通过 `mvn test -Dtest=<TestClass>`
 
 ---
@@ -98,6 +103,11 @@ stage: 1-test-foundation
 
 **验收标准：**
 - [ ] 缺失的测试已补齐
+- [ ] 每个方法至少覆盖正常路径 + 边界条件 + 异常路径（最低三条）
+- [ ] 断言消息使用中文
+- [ ] 单元测试禁止 mock 被测类本身
+- [ ] 集成测试使用 `@ActiveProfiles("integration-mysql-baseline")`，连接真实 MySQL，禁止 `@MockBean` 和 Testcontainers
+- [ ] 集成测试有数据准备和清理机制
 - [ ] 测试通过
 
 ---
@@ -119,3 +129,5 @@ Stage 1 补测完成条件：
 - [ ] 中优先级 Task 已完成或已标记为"按需"
 - [ ] test-gap 文档覆盖状态已全部更新
 - [ ] `mvn test` 在 MySQL 下全绿
+- [ ] 无 `@MockBean` 替代数据库的集成测试
+- [ ] 无 Testcontainers 依赖引入
