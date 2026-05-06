@@ -131,3 +131,5 @@ Stage 1 补测完成条件：
 - [ ] `mvn test` 在 MySQL 下全绿
 - [ ] 无 `@MockBean` 替代数据库的集成测试
 - [ ] 无 Testcontainers 依赖引入
+- [ ] 基线报告已产出：`project-docs/reports/YYYY-MM-DD-test-baseline-mysql.md`
+- [ ] Git tag `stage-1-baseline-mysql-green` 已打
