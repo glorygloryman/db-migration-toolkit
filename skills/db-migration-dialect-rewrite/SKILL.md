@@ -180,11 +180,9 @@ description: 针对风险矩阵中的某一类差异，给出 MySQL → 瀚高 v
 
 ## 后续步骤
 
-**清单生成后，请依次调用以下两个 skill 完成改写闭环：**
+**清单生成并经人工 review 后，建议使用 superpowers 标准流程完成改写闭环：**
 
-1. **`/db-migration-stage4-plan-rewrite`** — 将清单拆解为原子任务执行计划，生成可独立执行的标准化提示词
-2. **`/db-migration-stage4-execute-task`** — 逐条执行原子任务，运行集成测试，回写进度
-
-建议流程：先调用 plan-rewrite 生成执行计划，然后按计划逐条调用 execute-task 完成改写。
+1. **`/superpowers:writing-plans`** — 以本清单为输入，拆解为原子执行计划
+2. **`/superpowers:executing-plans`** — 按计划逐步执行改写、跑测试、验证
 
 → 所有类别闭环后进入 Stage 5

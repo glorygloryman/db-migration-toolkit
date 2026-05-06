@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.8 — 2026-05-06
+
+**精简 Stage 4：移除冗余 Skill，改用 superpowers 标准流程接管**
+
+### 变更
+- 移除 `skills/db-migration-stage4-plan-rewrite/`：该 Skill 产出的执行计划与 `dialect-rewrite` 清单信息高度冗余，其任务拆解能力由 superpowers `writing-plans` 替代
+- 移除 `skills/db-migration-stage4-execute-task/`：逐条执行能力由 superpowers `executing-plans` 替代，"只跑对应测试、不修失败原因"等约束写入 plan 即可
+- `skills/db-migration-dialect-rewrite/SKILL.md`：后续步骤改为引导使用 `superpowers:writing-plans` + `superpowers:executing-plans`，并带入迁移特定约束
+- `CLAUDE.md`：Skill 数量 10→8，移除已删 Skill 描述，更新 Skill 写作约定
+- `README.md`：Skills 清单表与软链命令同步精简
+
 ## v0.2.7 — 2026-04-30
 
 **Stage 1 test-plan 验收标准明确：聚焦覆盖性，不要求瀚高环境通过**
