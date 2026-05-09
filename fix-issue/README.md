@@ -73,6 +73,12 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 - [ComprehensiveRankMapper 无 GROUP BY 隐式聚合 + ROUND 类型 + GROUP BY 严格模式](2026-04-28-comprehensive-rank-round-groupby.md) — 🟡 语法 | propagation-billboard | R-021, R-020
 - [HighGo DDL 可执行不等于 Flyway 启动迁移链路可用](2026-04-29-highgo-ddl-flyway-not-hard-gate.md) — 🟡 其他 | stream-keywords-search | 无
 - [多数据库测试 profile 需要隔离，避免跨库测试串入](2026-04-29-test-profile-cross-database-leak.md) — 🟡 其他 | stream-keywords-search | 无
+- [DISTINCT ON 排序语义变化导致分页行为不一致](2026-05-08-weibo-bomb-distinct-on-ordering.md) — 🟡 语法 | tmy-decision-center | 无
+- [JPA Criteria.groupBy / PageInfo.addGroupby 在瀚高方言下不兼容](2026-05-08-jpa-criteria-groupby-highgo-incompat.md) — 🔴 语法 | tmy-decision-center | R-020
+- [DISTINCT ON → ROW_NUMBER() 窗口函数改写方案](2026-05-09-rownumber-vs-distinct-on.md) — 🟢 语法 | tmy-decision-center | 无
+- [日期范围查询从字符串比较改为原生类型范围比较](2026-05-09-date-range-string-to-native-type.md) — 🟡 函数 | tmy-decision-center | 无
+- [PostgreSQL 列名大小写敏感导致查询失败](2026-05-09-pg-column-case-sensitivity.md) — 🟡 保留字 | tmy-decision-center | 无
+- [Entity 字段类型 String → Integer 修正](2026-05-09-entity-type-string-to-integer.md) — 🟡 类型 | tmy-decision-center | R-020
 
 ## 贡献流程
 

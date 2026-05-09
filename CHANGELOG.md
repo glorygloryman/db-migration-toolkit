@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.9 — 2026-05-09
+
+**Pilot 知识回灌（tmy-decision-center）：DISTINCT ON 排序、JPA Criteria groupBy、日期范围、列名大小写、Entity 类型**
+
+### fix-issue
+- 新增 `fix-issue/2026-05-08-weibo-bomb-distinct-on-ordering.md`：DISTINCT ON 排序语义变化导致分页行为不一致（子查询包裹 + countQuery 去重方案）
+- 新增 `fix-issue/2026-05-08-jpa-criteria-groupby-highgo-incompat.md`：JPA Criteria.groupBy / PageInfo.addGroupby 在瀚高方言下不兼容（框架层 GROUP BY 路径被风险矩阵遗漏）
+- 新增 `fix-issue/2026-05-09-rownumber-vs-distinct-on.md`：DISTINCT ON → ROW_NUMBER() 窗口函数改写方案（标准 SQL 替代 PostgreSQL 专有语法）
+- 新增 `fix-issue/2026-05-09-date-range-string-to-native-type.md`：日期范围查询从字符串比较改为原生类型范围比较（索引可用 + 左闭右开语义）
+- 新增 `fix-issue/2026-05-09-pg-column-case-sensitivity.md`：PostgreSQL 列名大小写敏感导致查询失败
+- 新增 `fix-issue/2026-05-09-entity-type-string-to-integer.md`：Entity 字段类型 String → Integer 修正（数据库整数列声明为 String）
+- `fix-issue/README.md`：索引从 8 条扩展到 14 条
+
+### 备注
+- 排除 `2026-05-09-pg-round-numeric-cast.md`：ROUND(numeric) 类型问题已在 v0.2.3 ~ v0.2.6 的 3 条 fix-issue 中充分覆盖
+
 ## v0.2.8 — 2026-05-06
 
 **精简 Stage 4：移除冗余 Skill，改用 superpowers 标准流程接管**
