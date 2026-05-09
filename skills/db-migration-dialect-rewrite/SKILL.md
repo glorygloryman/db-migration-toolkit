@@ -183,6 +183,6 @@ description: 针对风险矩阵中的某一类差异，给出 MySQL → 瀚高 v
 **清单生成并经人工 review 后，建议使用 superpowers 标准流程完成改写闭环：**
 
 1. **`/superpowers:writing-plans`** — 以本清单为输入，拆解为原子执行计划
-2. **`/superpowers:executing-plans`** — 按计划逐步执行改写、跑测试、验证
+2. **`/superpowers:executing-plans`** — 按计划逐步执行改写、验证
 
 → 所有类别闭环后进入 Stage 5
