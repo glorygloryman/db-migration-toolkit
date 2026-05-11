@@ -112,6 +112,7 @@
 | `ORDER BY RAND()` | 不支持 `RAND()` 函数名 | 🔄 | 改为 `ORDER BY RANDOM()` |
 | `STRAIGHT_JOIN` | 不支持 | 🔄 | 去除；如需强制连接顺序，使用 PG 的 `join_collapse_limit=1` 会话参数或 `pg_hint_plan` 扩展 |
 | `USE INDEX(...)` / `FORCE INDEX(...)` / `IGNORE INDEX(...)` | 不支持 hint 语法 | 🔄 | 去除；必要时改用 `enable_seqscan=off`、`pg_hint_plan` 扩展 |
+| `MATCH(col) AGAINST (... IN BOOLEAN MODE)` | 不支持 MySQL FULLTEXT 查询语法 | 🔄 | 简单账号名 / 标题等短文本检索优先改为参数化 `LIKE` / HighGo 字符串匹配，例如 `col LIKE CONCAT('%', #{keyword}, '%')`；保留原业务过滤条件。正文大字段或高性能全文检索需求再单独评估 `to_tsvector` / GIN / 三元组索引等方案。参考：`fix-issue/2026-05-11-match-against-highgo-like-decision.md` |
 | 字符串拼接 `CONCAT(a,b)` | 支持 `CONCAT`，也支持 `||` | ✅ | 注意 `||` 在有 NULL 时整表达式为 NULL，与 `CONCAT` 行为不同 |
 | `IFNULL(a, b)` | `COALESCE(a, b)` | 🔄 | 通用改写为 `COALESCE` |
 | 隐式类型转换（跨类型操作） | PG 严格类型检查，不自动转型 | ❌ | MySQL 允许 `int_col LIKE '%x%'`、`LEFT(int_col, 2) = '53'`、`string_param = int_col` 等跨类型操作；PG 直接报 `operator does not exist` 错误。改写策略：① 整数列参与 `LIKE` / `LEFT` / `RIGHT` → 加 `::TEXT`，如 `region_id::TEXT LIKE #{regionId}`；② 字符串参数与整数列比较 → 加 `::INT`，如 `#{param}::INT = int_col`（注意参数值合法性） |
