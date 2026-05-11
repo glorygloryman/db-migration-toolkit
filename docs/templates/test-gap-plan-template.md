@@ -83,7 +83,10 @@ stage: 1-test-foundation
 - [ ] 所有涉及方法均有对应集成测试
 - [ ] 使用 `@ActiveProfiles("integration-mysql-baseline")`
 - [ ] 测试连接真实 MySQL 数据库（禁止 `@MockBean` 替代数据库，禁止 Testcontainers）
-- [ ] 测试数据有准备和清理机制
+- [ ] 测试使用真实 MySQL schema 中已存在的库、表、字段
+- [ ] 测试未自行创建数据库对象（无 `CREATE DATABASE` / `CREATE SCHEMA` / `CREATE TABLE` / `CREATE TEMPORARY TABLE` / `CREATE TABLE ... LIKE ...` / `ALTER TABLE` / `DROP TABLE` / `DROP TEMPORARY TABLE`）
+- [ ] 测试数据只通过 `INSERT` / `UPDATE` / `DELETE` 准备，并有清理机制
+- [ ] 若真实 schema 缺失库、表或字段，已标记为 blocker，未用临时库、临时表、影子表或 fixture 表绕过
 - [ ] 断言消息使用中文
 - [ ] 测试通过 `mvn test -Dtest=<TestClass>`
 
@@ -107,7 +110,9 @@ stage: 1-test-foundation
 - [ ] 断言消息使用中文
 - [ ] 单元测试禁止 mock 被测类本身
 - [ ] 集成测试使用 `@ActiveProfiles("integration-mysql-baseline")`，连接真实 MySQL，禁止 `@MockBean` 和 Testcontainers
-- [ ] 集成测试有数据准备和清理机制
+- [ ] 集成测试使用真实 MySQL schema 中已存在的库、表、字段
+- [ ] 集成测试未自行创建数据库对象
+- [ ] 集成测试只通过 `INSERT` / `UPDATE` / `DELETE` 准备测试数据，并有清理机制
 - [ ] 测试通过
 
 ---
@@ -131,5 +136,8 @@ Stage 1 补测完成条件：
 - [ ] `mvn test` 在 MySQL 下全绿
 - [ ] 无 `@MockBean` 替代数据库的集成测试
 - [ ] 无 Testcontainers 依赖引入
+- [ ] 无测试自行创建数据库对象
+- [ ] 无通过临时库、临时表、影子表或 fixture 表绕过真实 schema 的集成测试
+- [ ] Mapper / DAO / SQL 引用的数据库、表、字段均已确认存在于真实 MySQL schema；缺失项已列为 blocker
 - [ ] 基线报告已产出：`project-docs/reports/YYYY-MM-DD-test-baseline-mysql.md`
 - [ ] Git tag `stage-1-baseline-mysql-green` 已打

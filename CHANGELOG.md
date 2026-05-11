@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.10 — 2026-05-11
+
+**真实 schema 集成测试硬门禁：禁止测试自行创建数据库对象**
+
+### 规则
+- `README.md` / `CLAUDE.md`：新增数据库测试硬门禁，要求集成测试必须使用真实数据库中已存在的 schema / 表 / 字段，禁止测试自行创建数据库对象。
+- 明确禁止测试代码、`@Sql`、`@BeforeAll`、fixture、support helper、迁移验证工具执行 `CREATE DATABASE`、`CREATE SCHEMA`、`CREATE TABLE`、`CREATE TEMPORARY TABLE`、`CREATE TABLE ... LIKE ...`、`ALTER TABLE`、`DROP TABLE`、`DROP TEMPORARY TABLE`。
+- 明确缺失数据库、表、字段必须在 Stage 0 / Stage 1 暴露为 blocker，禁止拖到 Stage 4 首次提出。
+
+### SOP / Skill
+- `docs/sop/stage-0-kickoff.md`、`docs/sop/stage-1-test-baseline.md`、`docs/sop/stage-4-dialect-adapt.md`、`docs/sop/stage-5-verify-deliver.md`：补充真实 schema 检查、测试 DDL 禁令和各阶段出口门禁。
+- `skills/db-migration-baseline`、`skills/db-migration-sql-scan`、`skills/db-migration-test-gap`、`skills/db-migration-test-plan`、`skills/db-migration-test-execute`、`skills/db-migration-verify`：补充真实 schema 对齐、测试 DDL 扫描、无效覆盖降级和验收阻塞规则。
+
+### 模板 / 清单
+- `docs/templates/baseline-template.md`、`docs/templates/risk-matrix-template.md`、`docs/templates/test-gap-template.md`、`docs/templates/test-gap-plan-template.md`：新增真实 schema 缺口、测试自行创建数据库对象、无效覆盖相关字段。
+- `docs/checklists/pre-research-checklist.md`、`docs/checklists/migration-pr-checklist.md`、`docs/checklists/acceptance-checklist.md`：新增禁止测试自行创建数据库对象与缺失 schema 早期 blocker 检查项。
+
 ## v0.2.9 — 2026-05-09
 
 **Pilot 知识回灌（tmy-decision-center）：DISTINCT ON 排序、JPA Criteria groupBy、日期范围、列名大小写、Entity 类型**

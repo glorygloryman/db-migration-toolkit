@@ -18,6 +18,7 @@
 
 - 已拉改造分支 `feature/db-migration-highgo`
 - 工程可在本地启动，连得上现有 MySQL
+- 已获取真实 MySQL schema 导出或具备只读访问权限，用于核对代码引用的库、表、字段是否真实存在
 
 ## 步骤
 
@@ -46,8 +47,10 @@
 调用 Skill `db-migration-sql-scan`，扫描：
 - Mapper XML + `@Query` + 字符串 SQL
 - 语法特征、函数调用、类型声明、保留字使用
+- SQL / Mapper / DAO 引用的数据库、表、字段是否存在于真实 MySQL schema
 
 产出：`risk-matrix.md`，按 **文件 × 特性 × 严重度** 三维矩阵。
+若发现代码引用了真实 schema 中不存在的数据库、表或字段，必须在 Stage 0 产出中标记为 blocker，不得留到 Stage 4 首次暴露。
 
 ### 0.4 测试基线评估
 
@@ -70,6 +73,8 @@
 
 使用 [`checklists/pre-research-checklist.md`](../checklists/pre-research-checklist.md) 逐项核对。
 
+**硬门禁**：Stage 0 结束前必须完成代码引用与真实 MySQL schema 的差异检查。缺失数据库、表、字段属于 blocker；未确认前不得进入 Stage 1。
+
 ## 产出物
 
 | 文件 | 位置 | 模板 |
@@ -83,6 +88,7 @@
 - 三件套只记"现状事实"，不下判断、不写方案
 - `fact` 类文档必须含 `updated:` 字段（遵循 CLAUDE.md §5）
 - 如发现工程架构异常（如混用多套 ORM、大量存储过程），立即升级风险级别
+- 不允许用临时库、临时表、影子表或 fixture 表替代真实 schema 检查；这类结果不得作为 Stage 0 / Stage 1 通过证据
 
 ## 下一阶段
 

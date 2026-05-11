@@ -30,6 +30,7 @@
 3. **分类别 commit**：每类差异一个 commit，便于回滚与 review
 4. **每个 commit 后测试跑绿**再进入下一类
 5. **改码 + 改测试分开提交**：若需调整断言，单独 commit 说明原因
+6. **Stage 4 不接收首次发现的真实 schema 缺口**：数据库、表、字段缺失必须在 Stage 0 / Stage 1 暴露；若 Stage 4 才发现，必须回退补 Stage 0 / Stage 1 blocker 记录，不能用临时库、临时表、影子表或 fixture 表继续测试
 
 ## 步骤
 
@@ -105,6 +106,8 @@
 
 - 先跑 `integration-highgo` profile，确认新功能绿
 - 再跑 `integration-mysql-baseline` profile，确认未破坏 MySQL 行为（保留 MySQL 兼容时）
+- 两套集成测试都必须使用真实数据库中已存在的 schema / 表 / 字段；禁止测试自行执行 `CREATE DATABASE`、`CREATE SCHEMA`、`CREATE TABLE`、`CREATE TEMPORARY TABLE`、`CREATE TABLE ... LIKE ...`、`ALTER TABLE`、`DROP TABLE`、`DROP TEMPORARY TABLE`
+- 测试数据准备只允许对真实表执行 `INSERT` / `UPDATE` / `DELETE` 并清理；缺失数据库对象必须记 blocker，不允许临时造表绕过
 
 **例外**：若改动是瀚高特有（如 `databaseId` 分方言），MySQL 基线应跳过对应用例。
 
@@ -127,6 +130,8 @@
 - [ ] 函数层脚本已覆盖的条目均有测试覆盖（而非仅靠 ✅ 假设通过）
 - [ ] 未修改 `db/migration/mysql/` 任何文件
 - [ ] 所有“分方言”或“架构调整”决策有 `decisions/` 记录
+- [ ] 无测试自行创建数据库对象，无通过临时库、临时表、影子表或 fixture 表绕过真实 schema 的验证
+- [ ] 未出现 Stage 4 首次发现且未回写 Stage 0 / Stage 1 的缺失数据库、表、字段 blocker
 
 ## 产出物
 
