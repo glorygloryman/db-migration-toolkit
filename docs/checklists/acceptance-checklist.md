@@ -16,12 +16,17 @@
 - [ ] 单元测试与集成测试数量与 Stage 1 基线一致（或差异有说明）
 - [ ] 测试运行耗时无爆炸性增长（如超 2×，记录说明）
 - [ ] Stage 2 冒烟 SQL 7 条（含 R-002 DATE_FORMAT 递归验证 / R-015 脚本缺口反向验证 / R-017 版本标记）全部通过
+- [ ] 集成测试使用真实数据库中已存在的 schema / 表 / 字段
+- [ ] 测试代码、`@Sql`、`@BeforeAll`、测试 support helper 未自行创建数据库对象
+- [ ] 无通过临时库、临时表、影子表或 fixture 表绕过真实 schema 的测试
 
 ## Schema
 
 - [ ] `flyway_schema_history` 表显示所有脚本成功
 - [ ] Schema 对比报告无遗漏
 - [ ] 索引、约束、默认值齐全
+- [ ] Mapper / DAO / SQL 引用的数据库、表、字段均已在真实 MySQL / HighGo schema 中确认存在
+- [ ] 无 Stage 4 / Stage 5 首次发现且未回写 Stage 0 / Stage 1 的缺失 schema blocker
 
 ## 配置
 

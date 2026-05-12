@@ -12,7 +12,7 @@ MySQL → 瀚高（HighGo v4.1.5）改造通用工具包。
 
 ## 当前版本
 
-v0.2.8（2026-05-06 Stage 4 精简版，骨架版，待 Pilot 验证）
+v0.2.10（2026-05-11 真实 schema 集成测试硬门禁版，骨架版，待 Pilot 验证）
 
 ## 目录结构
 
@@ -66,6 +66,15 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 - **不做数据迁移**，仅做程序适配
 - **不改架构**，保留 MyBatis / JPA / JdbcTemplate 原结构
 - **集成测试使用本地/共享真实数据库**，禁用 Testcontainers 与 `@MockBean`
+- **集成测试必须使用真实数据库中已存在的 schema / 表 / 字段**，禁止测试自行创建数据库对象；缺失库、表、字段必须在 Stage 0 / Stage 1 作为 blocker 暴露
+
+## 数据库测试硬门禁
+
+- 所有数据库集成测试必须连接真实 MySQL / HighGo 数据库，并使用真实数据库中已经存在的 schema、表、字段验证。
+- 禁止任何测试代码、测试脚本、测试 fixture、`@Sql`、`@BeforeAll`、测试 support helper、迁移验证工具在测试过程中自行创建或修改数据库对象，包括但不限于 `CREATE DATABASE`、`CREATE SCHEMA`、`CREATE TABLE`、`CREATE TEMPORARY TABLE`、`CREATE TABLE ... LIKE ...`、`ALTER TABLE`、`DROP TABLE`、`DROP TEMPORARY TABLE`。
+- 测试数据准备只允许对真实 schema 中已存在的表执行 `INSERT` / `UPDATE` / `DELETE`，并必须具备按测试数据标识清理的 cleanup。
+- 如果 Mapper / DAO / SQL 引用的数据库、表或字段在真实 schema 中不存在，必须立即失败并记录为 schema 缺口 / blocker，禁止通过临时库、临时表、影子表、fixture 表绕过。
+- Stage 0 / Stage 1 必须扫描代码引用与真实 MySQL schema 的差异；Stage 4 只处理方言差异，不负责首次发现 schema 缺失问题。
 
 ## 迭代约定
 

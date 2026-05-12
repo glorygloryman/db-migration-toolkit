@@ -15,6 +15,8 @@ stage: 0-kickoff
 | 已有单元测试覆盖的方法数 | |
 | 已有集成测试覆盖的方法数 | |
 | 零覆盖方法数 | |
+| 无效集成测试覆盖数（测试自行创建数据库对象） | |
+| 真实 schema 缺口数（缺库 / 缺表 / 缺字段） | |
 
 ## 2. 关键路径覆盖清单（必须在 Stage 1 补齐）
 
@@ -39,19 +41,28 @@ stage: 0-kickoff
 - [ ] 本地瀚高 v4.1.5 实例 / 可访问共享测试库（已注入 MySQL 兼容脚本）
 - [ ] `application-integration-mysql-baseline.yml`
 - [ ] `application-integration-highgo.yml`
-- [ ] 测试造数工具（SQL / `@Sql` / 工具类）
+- [ ] 测试造数工具（SQL / `@Sql` / 工具类，仅允许对真实 schema 中已存在的表执行 `INSERT` / `UPDATE` / `DELETE`）
 - [ ] 测试后清理机制
+- [ ] 无测试自行创建数据库对象（禁止 `CREATE DATABASE` / `CREATE SCHEMA` / `CREATE TABLE` / `CREATE TEMPORARY TABLE` / `CREATE TABLE ... LIKE ...` / `ALTER TABLE` / `DROP TABLE` / `DROP TEMPORARY TABLE`）
 
-## 5. 补测工作量估算
+## 5. 真实 schema 缺口与无效覆盖
+
+| 类型 | 位置 | 对象 | 证据 | 处理状态 |
+|------|------|------|------|----------|
+| 缺表 / 缺字段 / 缺库 / 无效覆盖 | | | | blocker / 需改造 / 已确认 |
+
+## 6. 补测工作量估算
 
 - 需补单元测试：<N> 个方法，约 <X> 工时
 - 需补集成测试：<N> 个方法，约 <X> 工时
 - 测试基础设施搭建：约 <X> 工时
 
-## 6. 出口标准
+## 7. 出口标准
 
 Stage 1 完成条件：
 - 本清单中"关键路径"一栏全部补齐
 - 在 MySQL 下全绿
 - 本文件 `updated:` 字段刷新
 - 所有"已有覆盖"勾选真实反映代码状态
+- 不存在通过临时库、临时表、影子表或 fixture 表绕过真实 schema 的有效覆盖
+- Mapper / DAO / SQL 引用的数据库、表、字段均已确认存在于真实 MySQL schema；缺失项已列为 blocker

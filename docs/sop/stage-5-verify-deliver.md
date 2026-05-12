@@ -26,6 +26,8 @@ mvn -P integration-highgo clean test
 - 所有单元测试绿
 - 所有集成测试绿
 - 与 Stage 1 MySQL 基线比对，用例数一致（除非有明确声明的"瀚高特有用例"或"MySQL 特有用例已下线"）
+- 集成测试必须使用真实数据库中已存在的 schema / 表 / 字段；不得通过临时库、临时表、影子表或 fixture 表通过验收
+- 验收前必须扫描测试代码、`@Sql`、`@BeforeAll`、测试 support helper，确认不存在 `CREATE DATABASE`、`CREATE SCHEMA`、`CREATE TABLE`、`CREATE TEMPORARY TABLE`、`CREATE TABLE ... LIKE ...`、`ALTER TABLE`、`DROP TABLE`、`DROP TEMPORARY TABLE`
 
 ### 5.2 启动冒烟 + 接口回归
 
@@ -110,6 +112,8 @@ related-risk: R-xx
 ## 出口检查
 
 使用 [`checklists/acceptance-checklist.md`](../checklists/acceptance-checklist.md)。
+
+**硬门禁**：如发现测试自行创建数据库对象，或 Mapper / DAO / SQL 引用的数据库、表、字段未在真实 MySQL / HighGo schema 中确认存在，Stage 5 不得通过。
 
 ## 产出物
 

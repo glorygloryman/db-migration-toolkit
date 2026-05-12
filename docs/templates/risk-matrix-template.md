@@ -12,6 +12,8 @@ stage: 0-kickoff
 - **严重度**：🔴 高 / 🟡 中 / 🟢 低
 - **状态**：`pending`（待处理）/ `in-progress` / ✅（已闭环）/ `decision-deferred`（有 decisions 记录）/ `blocked`
 - **类别**：对应 `references/mysql-to-highgo-*-mapping.md` 中的大类
+- `真实 schema 缺口` 属于 🔴 blocker：代码引用的数据库、表、字段不存在于真实 MySQL schema 时必须在 Stage 0 / Stage 1 暴露，禁止留到 Stage 4 首次提出
+- 测试自行创建数据库对象（如 `CREATE TABLE` / `CREATE TEMPORARY TABLE` / `CREATE TABLE ... LIKE ...`）不得作为真实 schema 存在证据，必须记录为测试基线 blocker
 
 ## 矩阵
 
@@ -36,6 +38,8 @@ stage: 0-kickoff
 | JSON 函数 | | | | |
 | 事务 / 锁 | | | | |
 | 存储过程 / 触发器 | | | | |
+| 真实 schema 缺口 | | | | |
+| 测试自行创建数据库对象 | | | | |
 | 其他 | | | | |
 
 ## 高风险项单独罗列

@@ -30,6 +30,11 @@
 - [ ] 本 PR 涉及的模块，集成测试在瀚高下全绿
 - [ ] 无 `@MockBean` 替代数据库
 - [ ] 无 Testcontainers 依赖引入
+- [ ] 集成测试使用真实数据库中已存在的 schema / 表 / 字段
+- [ ] 测试未自行创建数据库对象（无 `CREATE DATABASE` / `CREATE SCHEMA` / `CREATE TABLE` / `CREATE TEMPORARY TABLE` / `CREATE TABLE ... LIKE ...` / `ALTER TABLE` / `DROP TABLE` / `DROP TEMPORARY TABLE`）
+- [ ] 测试数据准备仅对真实表执行 `INSERT` / `UPDATE` / `DELETE`，并已清理
+- [ ] 不存在通过临时库、临时表、影子表或 fixture 表绕过真实 schema 的测试
+- [ ] 如发现缺失数据库、表或字段，已在 Stage 0 / Stage 1 文档中记录为 blocker，未拖到 Stage 4 首次暴露
 - [ ] 若有用例增删，PR 描述说明原因
 
 ## 文档
