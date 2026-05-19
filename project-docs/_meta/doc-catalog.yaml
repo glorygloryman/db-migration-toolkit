@@ -55,10 +55,18 @@ entries:
     created: 2026-04-21
     updated: 2026-04-21
 
+  - path: project-docs/facts/2026-05-19-xz-source-projects-inventory.md
+    type: fact
+    title: xz-source 工程项目清单（详细分类）
+    summary: D:\TRS_BJ\xz-source 下 36 个工程完整清单：前端/后端/中间件分类、MySQL 依赖识别、迁移优先级排序、技术栈统计
+    created: 2026-05-19
+    updated: 2026-05-19
+    expires_hint: 30d
+
   - path: project-docs/facts/2026-04-21-consumer-projects-inventory.md
     type: fact
-    title: xz-source 消费方工程清单
-    summary: 本工具包覆盖的 33 个 Java/Spring Boot 工程清单、当前接入状态与 Pilot 标记
+    title: xz-source 消费方工程清单（已废弃）
+    summary: "[已废弃，被 2026-05-19 版本取代] 本工具包覆盖的 33 个 Java/Spring Boot 工程清单、当前接入状态与 Pilot 标记"
     created: 2026-04-21
     updated: 2026-04-21
     expires_hint: 30d
