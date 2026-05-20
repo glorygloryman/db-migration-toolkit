@@ -12,14 +12,15 @@
 | 后端 Java 项目 | 25 | 69% |
 | 前端项目 | 9 | 25% |
 | 工具包项目 | 2 | 6% |
-| **有 MySQL 依赖** | 25 | 69% |
-| **需迁移改造** | 25 | 69% |
+| **有 MySQL 依赖** | 21 | 58% |
+| **无 MySQL 依赖** | 4 | 11% |
+| **需迁移改造** | 21 | 58% |
 
 ---
 
-## 一、有 MySQL 依赖的后端项目（需迁移改造，25 个）
+## 一、有 MySQL 依赖的后端项目（需迁移改造，21 个）
 
-**重要发现**：经重新深入检查（验证配置文件、pom.xml、实际代码），**所有 25 个后端 Java 项目均有 MySQL 依赖**，需要全部纳入迁移计划。
+**重要发现**：经深入检查（验证配置文件、pom.xml、实际代码），**21 个后端 Java 项目有 MySQL 依赖**，需要纳入迁移计划。
 
 ### 1.1 核心 API 服务（5 个）
 
@@ -46,20 +47,16 @@
 | 9 | `xz-media-search` | 西藏媒体搜索 | wxb_yqzx_dev | Spring Boot |
 | 10 | `xz-snapshot-receive` | 西藏快照接收 | xz_data_test | Spring Boot |
 
-### 1.3 其他后端服务（10 个）
+### 1.3 其他后端服务（6 个）
 
 | # | 工程名称 | 功能描述 | 数据库 | 主要技术栈 |
 |---|---------|---------|--------|-----------|
-| 1 | `xz_accuse_server` | 西藏举报服务 | - | Spring Boot |
-| 2 | `xz_accuse_sync_server` | 西藏举报同步服务 | - | Spring Boot |
-| 3 | `xz_leader_view_socket` | 西藏领导视图 Socket | - | Spring Boot, WebSocket |
-| 4 | `xz_log_stat` | 西藏日志统计 | - | Spring Boot |
-| 5 | `xz_video_handle` | 西藏视频处理 | xz_data_test | Spring Boot |
-| 6 | `xz_yq_proxy_server` | 西藏网闸代理服务器 | - | Spring Boot |
-| 7 | `xz_yq_websocket` | 西藏 WebSocket 服务 | - | Spring Boot, WebSocket |
-| 8 | `trs-cloud-snapshot-rest` | 云快照 REST 服务 | - | Spring Boot, Flyway |
-| 9 | `trs-cloud-soundres-receive` | 云音频资源接收服务 | xz_data_test | Spring Boot |
-| 10 | `trs-cloud-xz-userMsg-receiver` | 云用户消息接收服务 | xz_data_test | Spring Boot |
+| 1 | `xz_accuse_server` | 西藏举报服务 | xz_accuse | Spring Boot |
+| 2 | `xz_leader_view_socket` | 西藏领导视图 Socket | xz_home_data_test | Spring Boot, WebSocket |
+| 3 | `xz_video_handle` | 西藏视频处理 | xz_data_test | Spring Boot |
+| 4 | `trs-cloud-snapshot-rest` | 云快照 REST 服务 | - | Spring Boot, Flyway |
+| 5 | `trs-cloud-soundres-receive` | 云音频资源接收服务 | xz_data_test | Spring Boot |
+| 6 | `trs-cloud-xz-userMsg-receiver` | 云用户消息接收服务 | xz_data_test | Spring Boot |
 
 **迁移优先级建议**：
 - **P0（首批验证）**: `xz_yq_server`, `xz_local_server`（已明确使用 MySQL 8.0.15 + Flyway）
@@ -68,7 +65,22 @@
 
 ---
 
-## 二、前端项目（无需数据库改造，9 个）
+## 二、无 MySQL 依赖的后端项目（4 个）
+
+**无需迁移改造**：这 4 个项目不依赖 MySQL 数据库，主要是消息队列、WebSocket 等中间件类型服务。
+
+| # | 工程名称 | 功能描述 | 主要技术栈 |
+|---|---------|---------|-----------|
+| 1 | `xz_log_stat` | 西藏日志收集和消息推送 | Spring Boot, RocketMQ |
+| 2 | `xz_accuse_sync_server` | 西藏举报同步服务 | Spring Boot |
+| 3 | `xz_yq_proxy_server` | 西藏网闸代理服务器 | Spring Boot |
+| 4 | `xz_yq_websocket` | 西藏 WebSocket 服务 | Spring Boot, WebSocket |
+
+**共同特征**：无数据源配置，主要功能是消息转发/代理/推送。
+
+---
+
+## 三、前端项目（无需数据库改造，9 个）
 
 | # | 工程名称 | 功能描述 | 技术栈 |
 |---|---------|---------|--------|
@@ -86,7 +98,7 @@
 
 ---
 
-## 三、工具包项目（2 个）
+## 四、工具包项目（2 个）
 
 | # | 工程名称 | 功能描述 |
 |---|---------|---------|
@@ -95,7 +107,7 @@
 
 ---
 
-## 四、中间件识别
+## 五、中间件识别
 
 基于工程名称与功能描述，识别出以下中间件类型项目：
 
@@ -108,13 +120,13 @@
 
 ---
 
-## 五、技术栈分布
+## 六、技术栈分布
 
 ### 后端技术栈
 - **框架**: Spring Boot (100%)
 - **数据访问**: MyBatis / JPA / JdbcTemplate
-- **数据库迁移**: Flyway (16%，即 4/25 个后端项目)
-- **实时通信**: WebSocket (20%, 5 个项目)
+- **数据库迁移**: Flyway (19%，即 4/21 个有 MySQL 依赖的项目)
+- **实时通信**: WebSocket (16%, 4 个项目)
 - **响应式**: WebFlux (4%, 1 个项目)
 
 ### 前端技术栈
@@ -125,25 +137,25 @@
 
 ---
 
-## 六、数据库迁移现状
+## 七、数据库迁移现状
 
 | 指标 | 数量/占比 |
 |------|----------|
 | 使用 Flyway 进行版本管理 | 4 个项目 |
 | 明确使用 MySQL 8.0.15 | 2 个项目 |
-| **全部后端项目均有 MySQL 依赖** | **25 个项目 (100%)** |
-| 已有标准化迁移流程 | 16% 的后端项目 |
+| **有 MySQL 依赖的后端项目** | **21 个项目 (84%)** |
+| 已有标准化迁移流程 | 19% 的有 MySQL 依赖项目 |
 
 **关键发现**：
-1. **迁移改造范围扩大**：经深度检查，所有 25 个后端项目均有 MySQL 依赖，需全部纳入迁移计划
-2. **迁移工具使用率较低**：仅 16% 的项目使用 Flyway，大部分项目需补充迁移脚本
+1. **迁移改造范围明确**：21 个后端项目有 MySQL 依赖，需纳入迁移计划
+2. **迁移工具使用率较低**：仅 19% 的有 MySQL 依赖项目使用 Flyway，大部分项目需补充迁移脚本
 3. **版本统一**：核心项目使用 MySQL 8.0.15，版本一致性好
 
 ---
 
 ## 附录：工程路径清单
 
-### 有 MySQL 依赖的后端项目路径（25 个，全部后端项目）
+### 有 MySQL 依赖的后端项目路径（21 个）
 ```
 # 核心 API 服务
 D:\TRS_BJ\xz-source\xz_yq_server
@@ -166,15 +178,19 @@ D:\TRS_BJ\xz-source\xz-snapshot-receive
 
 # 其他后端服务
 D:\TRS_BJ\xz-source\xz_accuse_server
-D:\TRS_BJ\xz-source\xz_accuse_sync_server
 D:\TRS_BJ\xz-source\xz_leader_view_socket
-D:\TRS_BJ\xz-source\xz_log_stat
 D:\TRS_BJ\xz-source\xz_video_handle
-D:\TRS_BJ\xz-source\xz_yq_proxy_server
-D:\TRS_BJ\xz-source\xz_yq_websocket
 D:\TRS_BJ\xz-source\trs-cloud-snapshot-rest
 D:\TRS_BJ\xz-source\trs-cloud-soundres-receive
 D:\TRS_BJ\xz-source\trs-cloud-xz-userMsg-receiver
+```
+
+### 无 MySQL 依赖的后端项目路径（4 个）
+```
+D:\TRS_BJ\xz-source\xz_log_stat
+D:\TRS_BJ\xz-source\xz_accuse_sync_server
+D:\TRS_BJ\xz-source\xz_yq_proxy_server
+D:\TRS_BJ\xz-source\xz_yq_websocket
 ```
 
 ### 前端项目路径
