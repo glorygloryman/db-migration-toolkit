@@ -4,6 +4,9 @@
 
 **Baseline template 内容完善**
 
+### 兼容脚本修复
+- `docs/references/highgo-v4.1.5-mysql-compat-functions.sql`：`substring(text, bigint)` 函数创建语法错误，函数名需用双引号包裹（`"substring"`）避免与 PG 内置保留关键字冲突
+
 ## v0.2.9 — 2026-05-09
 
 **Pilot 知识回灌（tmy-decision-center）：DISTINCT ON 排序、JPA Criteria groupBy、日期范围、列名大小写、Entity 类型**
