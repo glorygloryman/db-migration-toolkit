@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.1 — 2026-05-25
+
+**Pilot 知识回灌（bigv_data_receive）：db-sdk 兼容性验证 + 集成测试 DataSource 硬编码**
+
+### fix-issue
+- 新增 `fix-issue/2026-05-25-db-sdk-highgo-compat-verified.md`：db-sdk (trs-db-sdk) 1.4.11 在瀚高环境下验证通过，当前使用模式（AbsBeanRepository + Hybase 搜索操作）不涉及关系型 SQL 生成，R-008 可降级为 🟢
+- 新增 `fix-issue/2026-05-25-test-datasource-hardcoded-not-switchable.md`：集成测试 DataSource 硬编码导致 Maven profile 切换无效（`@SpringBootConfiguration` 绕过 Spring 属性绑定，需用 `System.getProperty()` + surefire `systemPropertyVariables` 桥接）
+
 ## v0.3.0 — 2026-05-12
 
 **Baseline template 内容完善**
