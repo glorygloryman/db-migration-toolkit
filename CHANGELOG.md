@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.3.2 — 2026-06-01
+
+**集成测试 Profile 切换机制标准化：`@ActiveProfiles` → Maven Profile `systemPropertyVariables`**
+
+### 变更
+- 集成测试不再使用 `@ActiveProfiles("integration-mysql-baseline")`，改为 Maven Profile 通过 `maven-surefire-plugin` 的 `systemPropertyVariables` 注入 `spring.profiles.active`，Spring Boot Test 自动拾取
+- 效果：同一套测试代码，`mvn -P integration-mysql-baseline test` 跑 MySQL，`mvn -P integration-highgo test` 跑瀚高，零代码修改
+
+### 文档
+- `CLAUDE.md`：不可动摇的前提假设新增第 8 条（集成测试不写 `@ActiveProfiles`）
+- `docs/sop/stage-1-test-baseline.md`：§1.3 集成测试配置改为 Maven Profile 注入说明
+- `docs/sop/stage-2-config-switch.md`：§2.2 新增 pom.xml profile `systemPropertyVariables` 配置模板
+- `docs/sop/stage-5-verify-deliver.md`：§5.1 补充零代码切换说明
+- `docs/templates/test-gap-plan-template.md`：2 处验收标准模板更新
+
+### Skill
+- `skills/db-migration-test-plan/SKILL.md`：验收标准更新
+- `skills/db-migration-test-execute/SKILL.md`：集成测试步骤 + 复核要点更新
+- `skills/work-cycle-auto/SKILL.md`：6 处 `@ActiveProfiles` 引用全部替换
+
 ## v0.3.1 — 2026-05-25
 
 **Pilot 知识回灌（bigv_data_receive）：db-sdk 兼容性验证 + 集成测试 DataSource 硬编码**

@@ -22,6 +22,8 @@
 mvn -P integration-highgo clean test
 ```
 
+> 由于集成测试不写 `@ActiveProfiles`，数据库 profile 由 Maven Profile 的 `systemPropertyVariables` 注入，此处无需修改任何测试代码即可从 MySQL 切换到瀚高。
+
 要求：
 - 所有单元测试绿
 - 所有集成测试绿

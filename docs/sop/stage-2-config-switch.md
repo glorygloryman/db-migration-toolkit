@@ -69,6 +69,51 @@ spring.datasource.username=xxx
 spring.datasource.password=xxx
 ```
 
+#### pom.xml Maven Profile 配置（surefire systemPropertyVariables）
+
+为让集成测试通过 `mvn -P <profile> test` 自动切换数据库，在 `pom.xml` 中为两个 profile 配置 `maven-surefire-plugin` 的 `systemPropertyVariables`：
+
+```xml
+<profiles>
+    <profile>
+        <id>integration-mysql-baseline</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <spring.profiles.active>integration-mysql-baseline</spring.profiles.active>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+    <profile>
+        <id>integration-highgo</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <spring.profiles.active>integration-highgo</spring.profiles.active>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
+```
+
+配置后，集成测试类**不写 `@ActiveProfiles`**，Spring Boot Test 自动从 `spring.profiles.active` 系统属性读取 profile 并加载对应的 `application-integration-*.yml`。
+
+效果：同一套测试代码，`mvn -P integration-mysql-baseline test` 跑 MySQL，`mvn -P integration-highgo test` 跑瀚高，零代码修改。
+
 ### 2.3 连接池方言适配
 
 **Druid**：

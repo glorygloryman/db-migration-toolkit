@@ -47,7 +47,8 @@
 - **禁止使用 `@MockBean` 替代数据库**
 - **必须使用真实 MySQL 中已存在的 schema / 表 / 字段**
 - **禁止测试自行创建数据库对象**：不得在测试代码、`@Sql`、`@BeforeAll`、fixture、support helper 中执行 `CREATE DATABASE`、`CREATE SCHEMA`、`CREATE TABLE`、`CREATE TEMPORARY TABLE`、`CREATE TABLE ... LIKE ...`、`ALTER TABLE`、`DROP TABLE`、`DROP TEMPORARY TABLE`
-- `@ActiveProfiles("integration-mysql-baseline")`
+- 不写 `@ActiveProfiles`，数据库 profile 由 Maven Profile 通过 `maven-surefire-plugin` 的 `systemPropertyVariables` 注入 `spring.profiles.active`，Spring Boot Test 自动拾取
+- 确认 `pom.xml` 中 `integration-mysql-baseline` profile 已配置 `systemPropertyVariables`（配置模板见 Stage 2 SOP §2.2）
 - 数据准备：只允许对真实 schema 中已存在的表执行 `INSERT` / `UPDATE` / `DELETE`，测试后按测试数据标识清理或回滚
 - 若测试所需数据库、表或字段不存在，必须立即失败并记录为 schema 缺口 / blocker，不允许用临时库、临时表、影子表或 fixture 表绕过
 
@@ -56,6 +57,8 @@
 ```bash
 mvn -P integration-mysql-baseline test
 # 或 IDE 内按 profile 运行
+
+> Maven Profile 通过 surefire `systemPropertyVariables` 自动将 `spring.profiles.active=integration-mysql-baseline` 注入 JVM，集成测试类无需写 `@ActiveProfiles`。
 ```
 
 全部绿后，记录结果到 `project-docs/reports/YYYY-MM-DD-test-baseline-mysql.md`：

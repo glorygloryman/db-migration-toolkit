@@ -81,7 +81,7 @@ stage: 1-test-foundation
 
 **验收标准：**
 - [ ] 所有涉及方法均有对应集成测试
-- [ ] 使用 `@ActiveProfiles("integration-mysql-baseline")`
+- [ ] `pom.xml` 已配置 Maven Profile `systemPropertyVariables` 注入 `spring.profiles.active`，集成测试不写 `@ActiveProfiles`
 - [ ] 测试连接真实 MySQL 数据库（禁止 `@MockBean` 替代数据库，禁止 Testcontainers）
 - [ ] 测试使用真实 MySQL schema 中已存在的库、表、字段
 - [ ] 测试未自行创建数据库对象（无 `CREATE DATABASE` / `CREATE SCHEMA` / `CREATE TABLE` / `CREATE TEMPORARY TABLE` / `CREATE TABLE ... LIKE ...` / `ALTER TABLE` / `DROP TABLE` / `DROP TEMPORARY TABLE`）
@@ -109,7 +109,7 @@ stage: 1-test-foundation
 - [ ] 每个方法至少覆盖正常路径 + 边界条件 + 异常路径（最低三条）
 - [ ] 断言消息使用中文
 - [ ] 单元测试禁止 mock 被测类本身
-- [ ] 集成测试使用 `@ActiveProfiles("integration-mysql-baseline")`，连接真实 MySQL，禁止 `@MockBean` 和 Testcontainers
+- [ ] 集成测试不写 `@ActiveProfiles`，通过 Maven Profile `systemPropertyVariables` 注入 profile，连接真实 MySQL，禁止 `@MockBean` 和 Testcontainers
 - [ ] 集成测试使用真实 MySQL schema 中已存在的库、表、字段
 - [ ] 集成测试未自行创建数据库对象
 - [ ] 集成测试只通过 `INSERT` / `UPDATE` / `DELETE` 准备测试数据，并有清理机制

@@ -268,7 +268,7 @@ Controller 处理：
 
 - 单元测试：JUnit 5 + Mockito，覆盖 正常 1 + 边界 1 + 异常 1（最低要求）
 - 集成测试：JUnit 5 + Spring Boot Test，**必须连本地真实 MySQL**
-- `@ActiveProfiles("integration-mysql-baseline")`
+- 不写 `@ActiveProfiles`，数据库 profile 由 Maven Profile 的 `systemPropertyVariables` 注入
 - **禁止 mock 被测类本身**，只 mock 外部依赖
 - **禁止使用 `@MockBean` 替代数据库**
 - **禁止使用 Testcontainers**
@@ -279,7 +279,7 @@ Controller 处理：
 2. 测试用例是否覆盖正常路径 + 边界条件 + 异常路径（最低三条，缺一不可）
 3. 断言消息使用中文
 4. 单元测试禁止 mock 被测类本身，只 mock 外部依赖；DB 必须真实，非 DB 外部依赖可 mock
-5. 集成测试使用 `@ActiveProfiles("integration-mysql-baseline")`，连接真实 MySQL，禁止 `@MockBean` 替代数据库，禁止 Testcontainers
+5. 集成测试不写 `@ActiveProfiles`，数据库 profile 由 Maven Profile 的 `systemPropertyVariables` 注入，连接真实 MySQL，禁止 `@MockBean` 替代数据库，禁止 Testcontainers
 6. 集成测试必须使用真实 MySQL schema 中已存在的库、表、字段
 7. 集成测试禁止自行创建数据库对象：不得使用 CREATE DATABASE、CREATE SCHEMA、CREATE TABLE、CREATE TEMPORARY TABLE、CREATE TABLE ... LIKE ...、ALTER TABLE、DROP TABLE、DROP TEMPORARY TABLE
 8. 集成测试数据准备只允许对已存在的真实表执行 INSERT / UPDATE / DELETE，并具备清理机制（回滚 / cleanup）
@@ -305,7 +305,7 @@ Working Directory: {PROJECT_PATH}
 2. 测试用例是否覆盖正常路径 + 边界条件 + 异常路径（最低三条，缺一不可）
 3. 断言消息使用中文
 4. 单元测试禁止 mock 被测类本身，只 mock 外部依赖；DB 必须真实，非 DB 外部依赖可 mock
-5. 集成测试使用 @ActiveProfiles("integration-mysql-baseline")，连接真实 MySQL，禁止 @MockBean 替代数据库，禁止 Testcontainers
+5. 集成测试不写 @ActiveProfiles，数据库 profile 由 Maven Profile 的 systemPropertyVariables 注入，连接真实 MySQL，禁止 @MockBean 替代数据库，禁止 Testcontainers
 6. 集成测试必须使用真实 MySQL schema 中已存在的库、表、字段
 7. 集成测试禁止自行创建数据库对象：不得使用 CREATE DATABASE、CREATE SCHEMA、CREATE TABLE、CREATE TEMPORARY TABLE、CREATE TABLE ... LIKE ...、ALTER TABLE、DROP TABLE、DROP TEMPORARY TABLE
 8. 集成测试数据准备只允许对已存在的真实表执行 INSERT / UPDATE / DELETE，并具备清理机制（回滚 / cleanup）
@@ -316,7 +316,7 @@ Working Directory: {PROJECT_PATH}
 - 单元测试命名: XxxServiceTest / XxxMapperTest
 - 集成测试命名: XxxMapperIntegrationTest / XxxServiceIntegrationTest
 - 断言消息用中文
-- 集成测试 @ActiveProfiles("integration-mysql-baseline")
+- 集成测试不写 @ActiveProfiles，数据库 profile 由 Maven Profile 注入
 
 禁止项:
 - 禁止 @MockBean 替代数据库，禁止 Testcontainers
@@ -371,7 +371,7 @@ mvn -P integration-mysql-baseline test
 2. **三条覆盖**：每测试类中断言数量 ≥ 3（正常 + 边界 + 异常各至少一条）
 3. **中文断言**：断言消息含中文字符（`assertThat(...).as("中文...")` 或 `assertEquals(..., "中文消息")`）
 4. **禁止 mock 被测类**：单元测试中若出现被测类 mock，立即红（如 `when(mockXxxMapper.selectById(...))`）
-5. **真实 MySQL 连接**：集成测试有 `@ActiveProfiles("integration-mysql-baseline")`，无 `@MockBean`/`Testcontainers`
+5. **真实 MySQL 连接**：集成测试不写 `@ActiveProfiles`，通过 Maven Profile `systemPropertyVariables` 注入 profile，无 `@MockBean`/`Testcontainers`
 6. **真实 schema**：集成测试的 `@Sql`/`@BeforeAll`/fixture 只对已存在的表做 DML，无 CREATE/DROP/ALTER
 7. **无 DDL 脚本**：测试代码和 support helper 中无 `CREATE DATABASE`/`CREATE SCHEMA`/`CREATE TABLE`/`DROP TABLE` 等关键字
 8. **cleanup 机制**：每个集成测试有 `@After`/`@AfterEach` 或 `@Sql` 回滚机制清理测试数据
