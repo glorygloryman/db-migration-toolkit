@@ -79,6 +79,9 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 - [日期范围查询从字符串比较改为原生类型范围比较](2026-05-09-date-range-string-to-native-type.md) — 🟡 函数 | tmy-decision-center | 无
 - [PostgreSQL 列名大小写敏感导致查询失败](2026-05-09-pg-column-case-sensitivity.md) — 🟡 保留字 | tmy-decision-center | 无
 - [Entity 字段类型 String → Integer 修正](2026-05-09-entity-type-string-to-integer.md) — 🟡 类型 | tmy-decision-center | R-020
+- [PostgreSQL 拒绝 string 与 date 的隐式比较](2026-06-01-pg-string-date-implicit-comparison.md) — 🟡 类型 | event_server | 无
+- [GeneratedKeyHolder 在 PostgreSQL 下返回多列](2026-06-01-generated-key-holder-multi-column.md) — 🟡 其他 | event_server | 无
+- [HikariCP connection-init-sql 方言不兼容](2026-06-01-hikari-connection-init-sql-dialect.md) — 🟡 连接池 | event_server | 无
 
 ## 贡献流程
 

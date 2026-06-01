@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.3 — 2026-06-01
+
+**Pilot 知识回灌（event_server）：String/Date 隐式比较、GeneratedKeyHolder 多列、HikariCP 方言**
+
+### fix-issue
+- 新增 `fix-issue/2026-05-29-pg-string-date-implicit-comparison.md`：PostgreSQL 拒绝 String 与 date/timestamp 隐式比较，需加 `::date` 或 `::timestamp` 显式转换
+- 新增 `fix-issue/2026-05-29-generated-key-holder-multi-column.md`：JdbcTemplate `GeneratedKeyHolder` 在 PostgreSQL 下返回多列（含所有 GENERATED 列），须指定具体列名数组替代 `RETURN_GENERATED_KEYS`
+- 新增 `fix-issue/2026-05-29-hikari-connection-init-sql-dialect.md`：HikariCP `connection-init-sql` MySQL/PostgreSQL 语法互不兼容，须按 profile 隔离
+- `fix-issue/README.md`：索引从 14 条扩展到 17 条
+
 ## v0.3.2 — 2026-06-01
 
 **集成测试 Profile 切换机制标准化：`@ActiveProfiles` → Maven Profile `systemPropertyVariables`**
