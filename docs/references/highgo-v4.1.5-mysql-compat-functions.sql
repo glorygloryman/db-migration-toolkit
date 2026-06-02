@@ -332,3 +332,21 @@ $$ IMMUTABLE STRICT LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION mysql_compat_version()
 RETURNS text AS $$ SELECT '1.0.0-highgo-v4.1.5-vendor-2026-04-21' $$
 LANGUAGE sql IMMUTABLE;
+
+-- 清理旧配置（如果存在）
+DROP FUNCTION IF EXISTS public.boolean_to_bit(boolean) CASCADE;
+DROP CAST IF EXISTS (boolean AS bit);
+
+-- 创建转换函数（关键：使用位串字面量）
+CREATE OR REPLACE FUNCTION public.boolean_to_bit(boolean)
+RETURNS bit AS $$
+SELECT CASE
+           WHEN $1 = TRUE THEN B'1'::bit
+        ELSE B'0'::bit
+END;
+$$ LANGUAGE SQL IMMUTABLE STRICT;
+
+-- 创建隐式转换（关键：必须是 IMPLICIT）
+CREATE CAST (boolean AS bit)
+    WITH FUNCTION public.boolean_to_bit(boolean)
+AS IMPLICIT;
