@@ -350,3 +350,29 @@ $$ LANGUAGE SQL IMMUTABLE STRICT;
 CREATE CAST (boolean AS bit)
     WITH FUNCTION public.boolean_to_bit(boolean)
 AS IMPLICIT;
+
+-- LAST_INSERT_ID()函数
+CREATE OR REPLACE FUNCTION LAST_INSERT_ID()
+RETURNS BIGINT AS $$
+DECLARE
+trigger_value BIGINT;
+    lastval_value BIGINT;
+BEGIN
+    -- 优先检查触发器记录的值
+BEGIN
+        trigger_value := current_setting('app.last_insert_id', true)::BIGINT;
+EXCEPTION WHEN OTHERS THEN
+        trigger_value := NULL;
+END;
+
+    -- 如果触发器有值，返回触发器记录的值
+    IF trigger_value IS NOT NULL THEN
+        RETURN trigger_value;
+END IF;
+
+    -- 回退到lastval()
+BEGIN
+RETURN lastval();
+EXCEPTION WHEN OTHERS THEN
+        RETURN 0;
+END;
