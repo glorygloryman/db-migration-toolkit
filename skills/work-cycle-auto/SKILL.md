@@ -538,23 +538,7 @@ mysqldump -h <host> -u <user> -p \
   <db_name> > mysql-schema.sql
 ```
 
-### 4.2 工具辅助转换
-
-调用 Skill `db-migration-schema-convert`（如已安装）或手动转换，产出初稿 `highgo-schema-draft.sql`。
-
-自动处理的常见差异：
-- `AUTO_INCREMENT` → `GENERATED ALWAYS AS IDENTITY` 或 `BIGSERIAL`
-- `ENGINE=InnoDB` / `DEFAULT CHARSET=utf8mb4` → 移除
-- `COMMENT` 子句语法
-- `TINYINT(1)` → `BOOLEAN`
-- `DATETIME` → `TIMESTAMP WITHOUT TIME ZONE`
-- `TEXT` / `MEDIUMTEXT` / `LONGTEXT` → 统一 `TEXT`
-- `JSON` → `JSONB`
-- `ENUM` → `VARCHAR + CHECK`
-- 保留字列名自动加双引号
-- 前缀索引 `KEY idx(col(10))` → 函数索引 `SUBSTR(col, 1, 10)`
-
-### 4.3 人工 review（必须）
+### 4.2 人工 review（必须）
 
 按以下清单逐表 review：
 
@@ -574,7 +558,7 @@ mysqldump -h <host> -u <user> -p \
 - 外键 `ON DELETE CASCADE` 依赖确认
 - `ON UPDATE CURRENT_TIMESTAMP` → PG 不原生支持，需触发器或应用层
 
-### 4.4 产出 Flyway 脚本
+### 4.3 产出 Flyway 脚本
 
 命名：`V{YYYYMMDDHHmm}__highgo_init_schema.sql`
 
@@ -586,11 +570,11 @@ mysqldump -h <host> -u <user> -p \
 - 不含 `DROP DATABASE` / `TRUNCATE`
 - 大变更拆多个 `V` 脚本
 
-### 4.5 DDL 防护语法冒烟（R-018）
+### 4.4 DDL 防护语法冒烟（R-018）
 
 在目标库执行防护语法冒烟测试，确认 `CREATE TABLE IF NOT EXISTS` / `DROP TABLE IF EXISTS` / `CREATE INDEX IF NOT EXISTS` / `ALTER TABLE ADD COLUMN IF NOT EXISTS` 均可用。`ADD CONSTRAINT IF NOT EXISTS` **PG 不支持**，用 `DO $$ BEGIN ... END $$;` 模拟。
 
-### 4.6 Flyway 执行验证
+### 4.5 Flyway 执行验证
 
 ```bash
 mvn -P integration-highgo flyway:migrate
@@ -601,17 +585,17 @@ mvn -P integration-highgo flyway:migrate
 - `flyway_schema_history` 表有记录
 - 表、索引、约束对齐预期
 
-### 4.7 Schema 对比校验
+### 4.6 Schema 对比校验
 
 产出 `project-docs/reports/YYYY-MM-DD-schema-diff.md`，对比项：表数量、每表列数/列名/类型、索引名与列组合、外键关系。
 
-### 4.8 回写风险矩阵
+### 4.7 回写风险矩阵
 
 回写 `RISK_MATRIX_PATH` 中由 Schema 迁移承接的风险项状态：
 - **可关闭项**：仅限 DDL/Schema 资产风险（`AUTO_INCREMENT` 映射、`ENGINE` 移除、`COMMENT` 转换等）
 - **不可关闭项**：涉及 Mapper 参数绑定的类型风险（`tinyint`/`datetime`/`longtext`）、字符集查询语义风险，保留到 Stage 5/6 真库验证后关闭
 
-### 4.9 出口检查
+### 4.8 出口检查
 
 - [ ] `db/migration/highgo/V*__init_schema.sql` 脚本可重复执行不报错
 - [ ] 所有表、索引、约束已建立

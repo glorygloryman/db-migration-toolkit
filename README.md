@@ -40,7 +40,6 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-test-gap .
 ln -s ../../../db-migration-toolkit/skills/db-migration-test-plan .
 ln -s ../../../db-migration-toolkit/skills/db-migration-test-execute .
 ln -s ../../../db-migration-toolkit/skills/db-migration-dialect-rewrite .
-ln -s ../../../db-migration-toolkit/skills/db-migration-schema-convert .
 ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 ```
 
@@ -55,7 +54,6 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 | `db-migration-test-gap` | 对比 Mapper 方法 vs 测试覆盖 | Stage 1 |
 | `db-migration-test-plan` | 将测试缺口拆分为可执行 Task 计划 | Stage 1 |
 | `db-migration-test-execute` | 按 Task 编号执行补测、验证、回写进度 | Stage 1 |
-| `db-migration-schema-convert` | 生成瀚高 DDL 对照稿 | Stage 3 |
 | `db-migration-dialect-rewrite` | 方言差异建议改写（不自动改码），后续由 superpowers 接管执行 | Stage 4 |
 | `db-migration-verify` | 跑测试 + 生成验收报告骨架 | Stage 5 |
 

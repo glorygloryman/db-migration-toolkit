@@ -24,19 +24,7 @@ mysqldump -h <host> -u <user> -p \
   <db_name> > mysql-schema.sql
 ```
 
-### 3.2 工具辅助转换（Skill `db-migration-schema-convert`）
-
-调用 Skill，产出初稿 `highgo-schema-draft.sql`。
-
-Skill 会自动处理的常见差异：
-- `AUTO_INCREMENT` → `GENERATED ALWAYS AS IDENTITY` 或 `BIGSERIAL`
-- `ENGINE=InnoDB` / `DEFAULT CHARSET=utf8mb4` → 瀚高对应 `WITH` 子句或移除
-- `COMMENT` 子句语法（列注释）
-- `DATETIME` / `TIMESTAMP` 保留或转换
-- 索引语法
-- 保留字列名自动加引号
-
-### 3.3 人工 review（必须）
+### 3.2 人工 review（必须）
 
 按以下清单逐表 review：
 
@@ -71,7 +59,7 @@ Skill 会自动处理的常见差异：
 - `ON UPDATE CURRENT_TIMESTAMP` → **PG 不原生支持**，需触发器模拟 或 应用层赋值
 - `DEFAULT (UUID())` → PG 用 `gen_random_uuid()`（pgcrypto 扩展）
 
-### 3.4 产出 Flyway 脚本
+### 3.3 产出 Flyway 脚本
 
 命名：`V{YYYYMMDDHHmm}__highgo_init_schema.sql`
 
@@ -83,13 +71,13 @@ Skill 会自动处理的常见差异：
 - 不含 `DROP DATABASE` / `TRUNCATE`
 - 大变更拆多个 `V` 脚本，不堆叠一个巨型文件
 
-### 3.5 基础数据与配置
+### 3.4 基础数据与配置
 
 若 MySQL 侧有业务初始化数据（字典表、菜单权限等）：
 - 使用 `R__highgo_seed_dictionary.sql`（repeatable）或 `V{n}__highgo_seed_xxx.sql`
 - 或通过 Stage 1 的集成测试 `@Sql` 注入
 
-### 3.6 Flyway 执行验证
+### 3.5 Flyway 执行验证
 
 ```bash
 mvn -P integration-highgo flyway:migrate
@@ -100,7 +88,7 @@ mvn -P integration-highgo flyway:migrate
 - 瀚高中 `flyway_schema_history` 表有记录
 - 表、索引、约束对齐预期
 
-### 3.7 Schema 对比校验
+### 3.6 Schema 对比校验
 
 工具：`liquibase diff` 或手写 SQL 对比脚本
 
@@ -112,7 +100,7 @@ mvn -P integration-highgo flyway:migrate
 
 产出：`project-docs/reports/YYYY-MM-DD-schema-diff.md`
 
-### 3.8 DDL 防护语法冒烟（R-018）
+### 3.7 DDL 防护语法冒烟（R-018）
 
 全局 CLAUDE.md §3.6 要求 Flyway 脚本含防护语法。**PG 对某些防护写法支持不完整**，Stage 3 开始前必须对本工程使用的防护写法在瀚高 v4.1.5 下冒烟：
 
@@ -145,7 +133,7 @@ DROP TABLE IF EXISTS _smoke_t;
 
 任一冒烟失败，记录到 `project-docs/fix-issue/` 并同步更新 `docs/references/mysql-to-highgo-syntax-mapping.md` DDL 节的"状态"列。
 
-### 3.9 回写风险矩阵中的 Stage3 承接项
+### 3.8 回写风险矩阵中的 Stage3 承接项
 
 Stage 3 结束前必须回写 `risk-matrix.md` 中由 Schema 迁移承接的风险项，避免 DDL / Schema 风险遗留到 Stage 5 前才补关。
 

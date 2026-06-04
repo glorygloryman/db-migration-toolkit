@@ -79,7 +79,6 @@
 | `db-migration-baseline` | Stage 0 | 扫描工程，生成前置调研三件套骨架 |
 | `db-migration-sql-scan` | Stage 0 | 基于正则 + 人工 review 扫描 MySQL 特性用法 |
 | `db-migration-test-gap` | Stage 1 | 对比 Mapper 方法与测试覆盖，输出补测清单 |
-| `db-migration-schema-convert` | Stage 3 | 生成瀚高 DDL 对照稿 |
 | `db-migration-dialect-rewrite` | Stage 4 | 针对差异点给出建议改写 diff（不自动改码） |
 | `db-migration-verify` | Stage 5 | 跑测试 + 生成验收报告骨架 |
 

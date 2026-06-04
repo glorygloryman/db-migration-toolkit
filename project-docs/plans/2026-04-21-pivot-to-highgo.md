@@ -1356,13 +1356,12 @@ git commit -m "docs(checklists): 3 份 checklist 切换到瀚高 v4.1.5（逐文
 - Modify: `skills/db-migration-baseline/SKILL.md`
 - Modify: `skills/db-migration-sql-scan/SKILL.md`
 - Modify: `skills/db-migration-test-gap/SKILL.md`
-- Modify: `skills/db-migration-schema-convert/SKILL.md`
 - Modify: `skills/db-migration-dialect-rewrite/SKILL.md`
 - Modify: `skills/db-migration-verify/SKILL.md`
 
 - [ ] **Step 14.1：每个 Skill 的 frontmatter `description` 字段**
 
-对所有 6 个 SKILL.md，Edit 将 `description` 字段中的 "GaussDB" → "瀚高" / "gaussdb" → "highgo"，保留触发关键词（MySQL 改造 / Stage N）。
+对所有 5 个 SKILL.md，Edit 将 `description` 字段中的 "GaussDB" → "瀚高" / "gaussdb" → "highgo"，保留触发关键词（MySQL 改造 / Stage N）。
 
 - [ ] **Step 14.2：正文术语替换**
 
@@ -1388,11 +1387,6 @@ git commit -m "docs(checklists): 3 份 checklist 切换到瀚高 v4.1.5（逐文
 
 **`skills/db-migration-dialect-rewrite/SKILL.md`**：重写"差异点清单"章节，按 Stage 4 类别分组（函数层脚本覆盖/缺口、语法层必改等）。Skill 输出建议应标注"是否依赖兼容脚本"。
 
-**`skills/db-migration-schema-convert/SKILL.md`**：
-- DDL 目标改 PG 语法（`GENERATED AS IDENTITY` / `COMMENT ON` / `BYTEA` / `JSONB`）
-- 新增注意：输出 DDL 前缀 `V*__highgo_init_schema.sql`
-- 新增提示：生成的 DDL 必须经过 Task 9 §3.8 的防护语法冒烟
-
 **`skills/db-migration-verify/SKILL.md`**：
 - 引用路径全部更新
 - 验收报告骨架的"目标库"字段默认瀚高 v4.1.5
@@ -1405,7 +1399,7 @@ grep -rn -E "GaussDB|gaussdb|B 兼容模式|B 模式|B模式" skills/
 # Expected: 无输出
 
 git add skills/
-git commit -m "skills: 6 个 Skill 切换目标库到瀚高 v4.1.5，扫描规则与差异清单同步调整"
+git commit -m "skills: 5 个 Skill 切换目标库到瀚高 v4.1.5，扫描规则与差异清单同步调整"
 ```
 
 ---
@@ -1712,11 +1706,11 @@ cd /Users/cy/MyWorkFactory/workspace/xz-source/stream_keywords_search
 mkdir -p .claude/skills
 cd .claude/skills
 for s in db-migration-baseline db-migration-sql-scan db-migration-test-gap \
-         db-migration-dialect-rewrite db-migration-schema-convert db-migration-verify; do
+         db-migration-dialect-rewrite db-migration-verify; do
   [ ! -L "$s" ] && ln -s ../../../db-migration-toolkit/skills/$s .
 done
 ls -la
-# 期望：6 条软链全部存在且指向有效目标
+# 期望：5 条软链全部存在且指向有效目标
 ```
 
 在 Claude Code 会话里尝试触发一个 Skill（例如 `/db-migration-baseline`），确认可加载。
@@ -1777,7 +1771,7 @@ psql "<瀚高连接串>" \
 
 - [ ] S1 工具包版本 v0.2.0 已发布
 - [ ] S2 残留扫描 0 命中
-- [ ] S3 6 条软链成功，Skill 可在 Claude Code 中触发
+- [ ] S3 5 条软链成功，Skill 可在 Claude Code 中触发
 - [ ] S4 正向 4 条冒烟 SQL 全通过，反向 3 条符合预期（报错或预期值）
 - [ ] S5 R-018 DDL 防护语法冒烟通过（不支持项已文档化）
 - [ ] S6 Stage 0 产出骨架文件正常

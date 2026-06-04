@@ -22,13 +22,12 @@ docs/2026-04-18-master-plan.md   ← 入口总方案，先读这份
 ├── risks/known-risks-highgo.md  ← 已知风险库
 └── templates/                   ← 下游工程产出文档的骨架模板
 
-skills/                          ← 8 个 Claude Code Skills，对应 Stage 0/0/1/1/1/3/4/5
+skills/                          ← 7 个 Claude Code Skills，对应 Stage 0/0/1/1/1/4/5
 ├── db-migration-baseline        ← Stage 0: 产出前置调研三件套骨架
 ├── db-migration-sql-scan        ← Stage 0: 扫描 MySQL 特性，出风险矩阵
 ├── db-migration-test-gap        ← Stage 1: Mapper vs 测试覆盖对比
 ├── db-migration-test-plan       ← Stage 1: 将测试缺口拆分为可执行 Task 计划
 ├── db-migration-test-execute    ← Stage 1: 按 Task 编号执行补测、验证、回写进度
-├── db-migration-schema-convert  ← Stage 3: 生成瀚高 DDL 对照稿
 ├── db-migration-dialect-rewrite ← Stage 4: 方言差异建议改写（不自动改码）
 │                                  └ 后续由 superpowers:writing-plans + executing-plans 接管
 └── db-migration-verify          ← Stage 5: 跑测试 + 生成验收报告

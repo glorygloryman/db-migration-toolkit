@@ -51,11 +51,11 @@ cd /Users/cy/MyWorkFactory/workspace/xz-source/stream_keywords_search
 mkdir -p .claude/skills
 cd .claude/skills
 for s in db-migration-baseline db-migration-sql-scan db-migration-test-gap \
-         db-migration-dialect-rewrite db-migration-schema-convert db-migration-verify; do
+         db-migration-dialect-rewrite db-migration-verify; do
   [ ! -L "$s" ] && ln -s ../../../db-migration-toolkit/skills/$s .
 done
 ls -la
-# 期望：6 条软链全部存在且指向有效目标
+# 期望：5 条软链全部存在且指向有效目标
 ```
 
 在 Claude Code 会话里尝试触发一个 Skill（例如 `/db-migration-baseline`），确认可加载。
@@ -124,7 +124,7 @@ grep -rn -E "⚠️ 待|<待确认-" --include="*.md" --include="*.yml" --includ
 
 - [ ] S1 工具包版本 v0.2.0 已发布
 - [ ] S2 残留扫描仅命中刻意保留项
-- [ ] S3 6 条软链成功，Skill 可在 Claude Code 中触发
+- [ ] S3 5 条软链成功，Skill 可在 Claude Code 中触发
 - [ ] S4 正向 4 条冒烟 SQL 全通过，反向 3 条符合预期（报错或预期值）
 - [ ] S5 R-018 DDL 防护语法冒烟通过（不支持项已文档化）
 - [ ] S6 Stage 0 产出骨架文件正常

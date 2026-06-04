@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.4 — 2026-06-04
+
+**移除 `db-migration-schema-convert` Skill：Schema 转换由瀚高官方迁移工具承担**
+
+### 变更
+- 移除 `skills/db-migration-schema-convert/`：实际改造中 Schema 转换均使用瀚高官方数据库迁移工具完成，该 Skill 已无实际价值
+- `CLAUDE.md`：Skill 数量 8→7，架构树移除该条目
+- `README.md`：Skills 清单表与软链命令移除该条目
+- `docs/2026-04-18-master-plan.md`：配套 Skills 表移除该行
+- `docs/sop/stage-3-schema-migration.md`：§3.2 工具辅助转换整段删除，后续步骤重编号
+- `skills/work-cycle-auto/SKILL.md`：Stage 4.2 工具辅助转换整段删除，后续步骤重编号
+- `project-docs/plans/2026-04-21-pilot-smoke-test.md`：软链循环与计数同步更新
+- `project-docs/plans/2026-04-21-pivot-to-highgo.md`：Task 14 文件列表、Step 14.3、软链循环、commit message 与计数同步更新
+- `project-docs/domain/2026-04-21-瀚高国产化改造标准业务流程.md`：Skill 计数同步更新
+
 ## v0.3.3 — 2026-06-01
 
 **Pilot 知识回灌（event_server）：String/Date 隐式比较、GeneratedKeyHolder 多列、HikariCP 方言**
