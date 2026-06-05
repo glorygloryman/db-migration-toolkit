@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.5 — 2026-06-05
+
+**Pilot 知识回灌（interaction-middleware）：Druid URL 识别、WallFilter dbType、JPA 原生 SQL 类型转换**
+
+### fix-issue
+- 新增 `fix-issue/2026-06-03-druid-highgo-driver-unknown.md`：Druid 1.1.6 `JdbcUtils` 不认识 `jdbc:highgo://` 协议，无法自动推断 driverClassName，须在 DataSource Bean 中显式调用 `setDriverClassName()`
+- 新增 `fix-issue/2026-06-03-druid-wallfilter-highgo-dbtype.md`：Druid 1.1.6 `WallFilter` 从 URL 推断 dbType 返回 null 导致初始化失败，须去掉 wall filter 或编程式设置 dbType 为 postgresql
+- 新增 `fix-issue/2026-06-03-jpa-native-query-string-timestamp-cast.md`：JPA `@Query(nativeQuery=true)` 中 String 参数与 timestamp 列比较被 PG 拒绝，须显式 `CAST(? AS timestamp)` 或改方法签名为 Date/LocalDateTime
+- `fix-issue/README.md`：索引从 17 条扩展到 20 条
+
 ## v0.3.4 — 2026-06-04
 
 **移除 `db-migration-schema-convert` Skill：Schema 转换由瀚高官方迁移工具承担**

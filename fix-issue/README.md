@@ -82,6 +82,9 @@ category: 驱动 / 连接池 / 语法 / 函数 / 类型 / 保留字 / 字符集 
 - [PostgreSQL 拒绝 string 与 date 的隐式比较](2026-06-01-pg-string-date-implicit-comparison.md) — 🟡 类型 | event_server | 无
 - [GeneratedKeyHolder 在 PostgreSQL 下返回多列](2026-06-01-generated-key-holder-multi-column.md) — 🟡 其他 | event_server | 无
 - [HikariCP connection-init-sql 方言不兼容](2026-06-01-hikari-connection-init-sql-dialect.md) — 🟡 连接池 | event_server | 无
+- [Druid 1.1.6 无法识别瀚高 JDBC URL，需显式设置 driverClassName](2026-06-03-druid-highgo-driver-unknown.md) — 🟡 连接池 | interaction-middleware | R-011
+- [Druid 1.1.6 WallFilter 不认识瀚高 JDBC URL，无法推断 dbType 导致初始化失败](2026-06-03-druid-wallfilter-highgo-dbtype.md) — 🟡 连接池 | interaction-middleware | R-011
+- [JPA @Query 原生 SQL 中 String 参数与 timestamp 列比较需显式 CAST](2026-06-03-jpa-native-query-string-timestamp-cast.md) — 🟡 类型 | interaction-middleware | R-020
 
 ## 贡献流程
 
