@@ -845,6 +845,16 @@ mvn -P integration-highgo clean test
 - 回滚方案
 - 附录：决策记录索引、踩坑记录索引
 
+### 6.4.1 MySQL 方言遗漏自检
+
+调用 Skill `db-migration-self-check`（如已安装），对项目 SQL 源码做 MySQL 方言遗漏扫描。
+
+输出：`docs/migration/self-check-report.md`
+
+行为：**仅出报告，不阻断交付**。命中项供人工 review，如需修复回到 Stage 4。
+
+自检报告作为验收报告附件，一并提供给 review 方。
+
 ### 6.5 踩坑回灌工具包
 
 把本工程发现的**通用性问题**提炼为 `fix-issue` 记录，推送回 `db-migration-toolkit`：
