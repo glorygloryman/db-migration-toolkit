@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.6 — 2026-06-05
+
+**新增 `db-migration-self-check` Skill：验收后 MySQL 方言遗漏自检**
+
+### 变更
+- 新增 `skills/db-migration-self-check/SKILL.md`：验收完成后扫描项目 SQL 源码（Mapper XML、注解 SQL、内嵌 SQL），发现可能遗漏的 MySQL 方言，输出结构化报告。仅出报告，不阻断交付
+- 新增 `skills/db-migration-self-check/self-check-rules.md`：检测规则清单，涵盖语法层 14 项（A1-A14）、兼容白名单 5 项（B1-B5）、必须标记函数 10 类（C1-C10）、风险提示 6 项（D1-D6）
+- `skills/work-cycle-auto/SKILL.md`：Stage 6 新增 6.4.1 步骤，在验收报告生成后调用 self-check
+
+### 文档
+- `docs/superpowers/specs/2026-06-05-self-check-skill-design.md`：设计文档
+- `docs/superpowers/plans/2026-06-05-self-check-skill.md`：实现计划
+
 ## v0.3.5 — 2026-06-05
 
 **Pilot 知识回灌（interaction-middleware）：Druid URL 识别、WallFilter dbType、JPA 原生 SQL 类型转换**

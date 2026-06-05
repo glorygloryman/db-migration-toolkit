@@ -12,7 +12,7 @@ MySQL → 瀚高（HighGo v4.1.5）改造通用工具包。
 
 ## 当前版本
 
-v0.2.10（2026-05-11 真实 schema 集成测试硬门禁版，骨架版，待 Pilot 验证）
+v0.3.6（2026-06-05 新增 self-check Skill，骨架版，待 Pilot 验证）
 
 ## 目录结构
 
@@ -41,6 +41,7 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-test-plan .
 ln -s ../../../db-migration-toolkit/skills/db-migration-test-execute .
 ln -s ../../../db-migration-toolkit/skills/db-migration-dialect-rewrite .
 ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
+ln -s ../../../db-migration-toolkit/skills/db-migration-self-check .
 ```
 
 软链方式保证工具包一处修改、所有工程同步生效。
@@ -56,6 +57,7 @@ ln -s ../../../db-migration-toolkit/skills/db-migration-verify .
 | `db-migration-test-execute` | 按 Task 编号执行补测、验证、回写进度 | Stage 1 |
 | `db-migration-dialect-rewrite` | 方言差异建议改写（不自动改码），后续由 superpowers 接管执行 | Stage 4 |
 | `db-migration-verify` | 跑测试 + 生成验收报告骨架 | Stage 5 |
+| `db-migration-self-check` | 验收后扫描 SQL 源码，发现遗漏的 MySQL 方言，输出报告（不阻断） | Stage 5 后 |
 
 ## 前提假设
 
