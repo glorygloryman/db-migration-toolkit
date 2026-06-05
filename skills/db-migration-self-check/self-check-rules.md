@@ -9,22 +9,23 @@
 
 PostgreSQL 完全不支持以下 MySQL 语法，在已改造项目中不应出现。
 
-| 编号 | 模式 | Grep 关键词/正则 | MySQL 写法 | PG 替代 |
-|------|------|-----------------|-----------|---------|
-| A1 | 反引号标识符 | `` `[^`]+` `` | `` `col_name` `` | 双引号或去引号 |
-| A2 | 双引号字符串字面量（SQL 上下文内） | `"[^"]*"` 在 SQL 片段中 | `"0000"`、`"%"` | 单引号 `'0000'`、`'%'` |
-| A3 | LIMIT m,n 分页 | `LIMIT\s+\d+\s*,\s*\d+`、`LIMIT\s*#\{[^}]+\}\s*,\s*#\{` | `LIMIT 10,20` | `LIMIT n OFFSET m` |
-| A4 | ON DUPLICATE KEY | `ON\s+DUPLICATE\s+KEY` | `ON DUPLICATE KEY UPDATE` | `ON CONFLICT ... DO UPDATE` |
-| A5 | REPLACE INTO | `REPLACE\s+INTO` | `REPLACE INTO t ...` | `ON CONFLICT` 或 DELETE+INSERT |
-| A6 | INSERT IGNORE | `INSERT\s+IGNORE` | `INSERT IGNORE INTO` | `ON CONFLICT DO NOTHING` |
-| A7 | 多表 UPDATE JOIN | `UPDATE\s+\w+\s+.*\bJOIN\b`（排除子查询） | `UPDATE t1 JOIN t2 SET` | `UPDATE ... FROM ... WHERE` |
-| A8 | UPDATE/DELETE + LIMIT | `(?:UPDATE|DELETE).*\bLIMIT\b` | `DELETE FROM t LIMIT 100` | 子查询限定 |
-| A9 | LOCK IN SHARE MODE | `LOCK\s+IN\s+SHARE\s+MODE` | `SELECT ... LOCK IN SHARE MODE` | `FOR SHARE` |
-| A10 | STRAIGHT_JOIN | `\bSTRAIGHT_JOIN\b` | `STRAIGHT_JOIN` | 不支持，需调整 |
-| A11 | USE/FORCE/IGNORE INDEX | `\b(?:USE|FORCE|IGNORE)\s+INDEX\b` | `USE INDEX(idx)` | 不支持 |
-| A12 | ORDER BY RAND() | `\bORDER\s+BY\s+RAND\s*\(` | `ORDER BY RAND()` | `RANDOM()` |
-| A13 | GROUP BY 非严格模式 | 语义判断：SELECT 列中有非聚合、非 GROUP BY 列 | `SELECT a,b,MAX(c) FROM t GROUP BY a` | PG 要求 b 也在 GROUP BY 中 |
-| A14 | PG 保留字冲突 | `\b(?:user|type|order|desc|group|role|level|status|current_user|session_user)\b` 作为列名/表名 | 列名 `user`、`type` | 加双引号或改名 |
+| 编号 | 模式 | Grep 关键词/正则 | MySQL 写法 | PG 替代                                                                         |
+|------|------|-----------------|-----------|-------------------------------------------------------------------------------|
+| A1 | 反引号标识符 | `` `[^`]+` `` | `` `col_name` `` | 双引号或去引号                                                                       |
+| A2 | 双引号字符串字面量（SQL 上下文内） | `"[^"]*"` 在 SQL 片段中 | `"0000"`、`"%"` | 单引号 `'0000'`、`'%'`                                                            |
+| A3 | LIMIT m,n 分页 | `LIMIT\s+\d+\s*,\s*\d+`、`LIMIT\s*#\{[^}]+\}\s*,\s*#\{` | `LIMIT 10,20` | `LIMIT n OFFSET m`                                                            |
+| A4 | ON DUPLICATE KEY | `ON\s+DUPLICATE\s+KEY` | `ON DUPLICATE KEY UPDATE` | `ON CONFLICT ... DO UPDATE`                                                   |
+| A5 | REPLACE INTO | `REPLACE\s+INTO` | `REPLACE INTO t ...` | `ON CONFLICT` 或 DELETE+INSERT                                                 |
+| A6 | INSERT IGNORE | `INSERT\s+IGNORE` | `INSERT IGNORE INTO` | `ON CONFLICT DO NOTHING`                                                      |
+| A7 | 多表 UPDATE JOIN | `UPDATE\s+\w+\s+.*\bJOIN\b`（排除子查询） | `UPDATE t1 JOIN t2 SET` | `UPDATE ... FROM ... WHERE`                                                   |
+| A8 | UPDATE/DELETE + LIMIT | `(?:UPDATE|DELETE).*\bLIMIT\b` | `DELETE FROM t LIMIT 100`                                                     | 子查询限定 |
+| A9 | LOCK IN SHARE MODE | `LOCK\s+IN\s+SHARE\s+MODE` | `SELECT ... LOCK IN SHARE MODE` | `FOR SHARE`                                                                   |
+| A10 | STRAIGHT_JOIN | `\bSTRAIGHT_JOIN\b` | `STRAIGHT_JOIN` | 不支持，需调整                                                                       |
+| A11 | USE/FORCE/IGNORE INDEX | `\b(?:USE|FORCE| IGNORE)\s+INDEX\b`                                                            | `USE INDEX(idx)` | 不支持 |
+| A12 | ORDER BY RAND() | `\bORDER\s+BY\s+RAND\s*\(` | `ORDER BY RAND()` | `RANDOM()`                                                                    |
+| A13 | GROUP BY 非严格模式 | 语义判断：SELECT 列中有非聚合、非 GROUP BY 列 | `SELECT a,b,MAX(c) FROM t GROUP BY a` | PG 要求 b 也在 GROUP BY 中                                                         |
+| A14 | PG 保留字冲突 | `\b(?:user|type| order                                                                         |desc|group|role|level|status|current_user|session_user)\b` 作为列名/表名 | 列名 `user`、`type` | 加双引号或改名 |
+| A15 | 用户变量赋值 | `@\w+\s*:=` | `@curlevel := if(...)` | `CROSS JOIN (SELECT CASE WHEN ... END AS var) sub` + 注意整数列可能需要进行类型转换 `::text` |
 
 ---
 
