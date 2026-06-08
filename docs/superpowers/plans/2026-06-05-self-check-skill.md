@@ -266,7 +266,7 @@ Grep: "SELECT|"INSERT|"UPDATE|"DELETE  (in .java files)
 
 ### 6. 生成报告
 
-写入 `{项目目录}/docs/migration/self-check-report.md`，格式如下：
+写入 `<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`，格式如下：
 
 ```markdown
 # MySQL 方言自检报告
@@ -313,7 +313,7 @@ Grep: "SELECT|"INSERT|"UPDATE|"DELETE  (in .java files)
 
 ## 输出
 
-- `{项目目录}/docs/migration/self-check-report.md`
+- `<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`
 - 控制台摘要：命中总数、按分类分布、高风险项 Top 10
 
 ## 约束
@@ -366,7 +366,7 @@ git commit -m "feat: add db-migration-self-check skill for MySQL dialect detecti
 
 调用 Skill `db-migration-self-check`（如已安装），对项目 SQL 源码做 MySQL 方言遗漏扫描。
 
-输出：`docs/migration/self-check-report.md`
+输出：`<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`
 
 行为：**仅出报告，不阻断交付**。命中项供人工 review，如需修复回到 Stage 4。
 

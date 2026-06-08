@@ -849,7 +849,7 @@ mvn -P integration-highgo clean test
 
 调用 Skill `db-migration-self-check`（如已安装），对项目 SQL 源码做 MySQL 方言遗漏扫描。
 
-输出：`docs/migration/self-check-report.md`
+输出：`<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`
 
 行为：**仅出报告，不阻断交付**。命中项供人工 review，如需修复回到 Stage 4。
 

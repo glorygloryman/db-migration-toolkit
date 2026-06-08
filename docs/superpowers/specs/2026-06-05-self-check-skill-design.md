@@ -118,7 +118,7 @@ db-migration-self-check
         │
         ▼
   ⑥ 输出报告
-  保存到 {项目目录}/docs/migration/self-check-report.md
+  保存到 <project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md
 ```
 
 ### 注释过滤规则

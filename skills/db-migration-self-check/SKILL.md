@@ -88,7 +88,7 @@ Grep: "SELECT|"INSERT|"UPDATE|"DELETE  (in .java files)
 
 ### 6. 生成报告
 
-写入 `{项目目录}/docs/migration/self-check-report.md`，格式如下：
+写入 `<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`，格式如下：
 
 ```markdown
 # MySQL 方言自检报告
@@ -135,7 +135,7 @@ Grep: "SELECT|"INSERT|"UPDATE|"DELETE  (in .java files)
 
 ## 输出
 
-- `{项目目录}/docs/migration/self-check-report.md`
+- `<project>/project-docs/reports/YYYY-MM-DD-mysql-dialect-self-check.md`
 - 控制台摘要：命中总数、按分类分布、高风险项 Top 10
 
 ## 约束
